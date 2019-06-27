@@ -11,9 +11,7 @@ This is the repository for [@DemonButlerBot](https://t.me/DemonButlerBot), a [Te
 ## Commands
 
 *	`/start`
-	The butler will greet you.
-*	`/help`
-	The butler will tell you what commands you can give him.
+	The butler will greet you and tell you what commands you can give him.
 *	`/stats <name>`
 	Looks up the stats of the player with the given `<name>`. Example: `/stats Zezima`
 *	`/ge <item>`

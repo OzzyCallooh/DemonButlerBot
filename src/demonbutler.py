@@ -12,25 +12,19 @@ from cmdlogging import logged_command
 
 @logged_command
 def cmd_start(bot, update):
-	#print('/start')
-	update.message.reply_text('Greetings, mortal.')
+	update.message.reply_text('Greetings, mortal. I can serve you in the following ways:\n' + \
+		'/stats <name> - Lookup player levels\n' + \
+		'/ge <item> - Lookup item on [GE](http://services.runescape.com/m=itemdb_oldschool/)\n' + \
+		'/greeting - Set new member greeting\\*\n' + \
+		'\\*Must be admin of group chat',
+		parse_mode='Markdown',
+		disable_web_page_preview=True
+	)
 
 @logged_command
 @require_permission('operator')
 def cmd_config(bot, update):
-	#print('/config')
-	update.message.reply_text('Configured')
-
-@logged_command
-def cmd_help(bot, update):
-	#print('/help')
-	update.message.reply_text('I can serve you in the following ways:\n' + \
-		'/stats <name> - Lookup player stats\n' + \
-		'/ge <item> - Lookup item on [GE](http://services.runescape.com/m=itemdb_oldschool/)\n' + \
-		'/greeting - Configure new memeber greeting*\n' + \
-		'*Must be admin of group chat',
-		parse_mode='Markdown'
-	)
+	update.message.reply_text('Nothing interesting happens.')
 
 stat_format = '''[{name}]({url}):
 ```
@@ -157,7 +151,6 @@ def main(argv):
 	updater = Updater(token=config['telegram']['token'])
 	updater.dispatcher.add_handler(CommandHandler('start', cmd_start))
 	updater.dispatcher.add_handler(CommandHandler('config', cmd_config))
-	updater.dispatcher.add_handler(CommandHandler('help', cmd_help))
 	updater.dispatcher.add_handler(CommandHandler('stats', cmd_stats, pass_args=True))
 	updater.dispatcher.add_handler(CommandHandler('ge', cmd_ge, pass_args=True))
 	updater.dispatcher.add_error_handler(handle_error)
