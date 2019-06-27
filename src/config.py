@@ -10,7 +10,6 @@ if len(sys.argv) < 2:
 	sys.exit(1)
 
 with open(sys.argv[1]) as f:
-	global config
 	config = json.loads(f.read())
 
 @MWT(timeout=60*10)
