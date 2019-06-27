@@ -1,0 +1,40 @@
+{
+	"__COMMENT__": "Perhaps you should make a copy of this configuration and save it to dev.config.json",
+
+	"logging": {
+		"level__COMMENT__": "https://docs.python.org/3.5/library/logging.html#logging-levels",
+		"level": "20"
+	},
+	"database": {
+		"uri__COMMENT__": "The database URI provided to SQLAlchemy.",
+		"uri": "sqlite:///database.db"
+	},
+	"telegram": {
+		"token__COMMENT__": "The Telegram bot token provided by the BotFather.",
+		"token": "",
+
+		"use_webhook__COMMENT__": "When false, bot will polling using the /getUpdates API endpoint instead.",
+		"use_webhook": false,
+		"webhook": {
+			"host__COMMENT__": "Host of the bot (can be IP address)",
+			"host": "demonbutlerbot.website.com",
+			"internal_post__COMMENT__": "Port to use for bot internal server. Webhook always uses 443 (route traffic using Nginx/Apache).",
+			"internal_port": 443,
+			"key__COMMENT__": "Path to SSL private key.",
+			"key": "/etc/nginx/Telegram/private.key",
+			"cert__COMMENT__": "Path to SSL cert.",
+			"cert": "/etc/nginx/Telegram/cert.pem"
+		}
+	},
+	"demon_butler": {
+
+	},
+	
+	"permissions__COMMENT__": "Special permissions granted to specific Telegram users.",
+	"permissions": {
+		"*__COMMENT__": "This permission is used by default:",
+		"*": { "unbanned_user": true },
+		"OzzyC": { "owner": true, "operator": true },
+		"91741518": { "owner": true, "operator": true }
+	}
+}

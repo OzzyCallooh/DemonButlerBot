@@ -1,0 +1,64 @@
+{
+	"aliases": {
+		"tbow": "Twisted bow",
+		"sgs": "Saradomin godsword",
+		"bgs": "Bandos godsword",
+		"zgs": "Zamorak godsword",
+		"sotd": "Staff of the dead",
+		"ely": "Elysian spirit shield",
+
+		"whip": "Abyssal whip",
+		"tent": "Kraken tentacle",
+		"tentacle": "Kraken tentacle",
+		"bp": "Toxic blowpipe (empty)",
+
+		"rcb": "Rune crossbow",
+		"dcb": "Dragon crossbow",
+		"acb": "Armadyl crossbow",
+		"dhcb": "Dragon hunter crossbow",
+
+		"dscim": "Dragon scimitar",
+		"bring": "Berserker ring",
+		"gmaul": "Granite maul",
+		"msb": "Magic shortbow",
+		"dbow": "Dark bow",
+
+		"dwh": "Dragon warhammer",
+
+		"anguish": "Necklace of anguish",
+		"suffering": "Ring of suffering",
+		"torture": "Necklace of tortue",
+		"occult": "Occult necklace",
+		"fury": "Amulet of fury",
+		"glory": "Amulet of glory(4)",
+
+		"ahrims": "Ahrim's armour set",
+		"guthans": "Guthan's armour set",
+		"veracs": "Verac's armour set",
+		"torags": "Torag's armour set",
+		"karils": "Karil's armour set",
+
+		"cannon": "Dwarf cannon set",
+		"cballs": "Cannonball",
+		"cball": "Cannonball",
+		"scale": "Zulrah's scales",
+
+		"ppot": "Prayer potion(4)",
+		"brew": "Saradomin brew(4)",
+		"restore": "Super restore(4)",
+		"stam": "Stamina potion(4)",
+
+		"karam": "Cooked karambwan",
+		"karambwan": "Cooked karambwan",
+
+		"nat": "Nature rune",
+		"nature": "Nature rune",
+		"law": "Law rune",
+		"wrath": "Wrath rune",
+		"chaos": "Chaos rune",
+		"death": "Death rune"
+
+
+
+	}
+}

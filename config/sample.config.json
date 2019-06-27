@@ -1,0 +1,26 @@
+{
+	"logging": {
+		"level": "INFO"
+	},
+	"database": {
+		"uri": "sqlite:///database.db"
+	},
+	"telegram": {
+		"token": "BOT TOKEN HERE",
+		"use_webhook": false,
+		"webhook": {
+			"host": "demonbutlerbot.website.com",
+			"port": 443,
+			"key": "/etc/nginx/Telegram/private.key",
+			"cert": "/etc/nginx/Telegram/cert.pem"
+		}
+	},
+	"demon_butler": {
+
+	},
+	"permissions": {
+		"*": { "unbanned_user": true },
+		"OzzyC": { "owner": true, "operator": true },
+		"91741518": { "owner": true, "operator": true }
+	}
+}
