@@ -4,7 +4,7 @@ import logging
 def logged_command(func):
 	@wraps(wraps)
 	def wrapped(bot, update, *args, **kwargs):
-		msg = '[{userid}{username}{chatid}]: ' + update.message.text
+		msg = '[user:{userid}{username},chat:{chatid}]: ' + update.message.text
 		logging.info(msg.format(
 			userid=update.effective_user.id,
 			username=('(@' + update.effective_user.username + ')') \
