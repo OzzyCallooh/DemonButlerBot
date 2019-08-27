@@ -10,6 +10,8 @@ import database
 import util
 from cmdlogging import logged_command
 
+VERSION = "1.0.0"
+
 @logged_command
 def cmd_start(bot, update):
 	update.message.reply_text('Greetings, mortal. I can serve you in the following ways:\n' + \
