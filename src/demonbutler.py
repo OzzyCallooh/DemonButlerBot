@@ -299,6 +299,7 @@ def main(argv):
 	updater.dispatcher.add_handler(CommandHandler('slayer', make_hiscore_cmd(['Grotesque Guardians', 'Cerberus', 'Kraken', 'Alchemical Hydra']), pass_args=True))
 	updater.dispatcher.add_handler(CommandHandler('wildy', make_hiscore_cmd(['Crazy Archaeologist', 'Chaos Fanatic', 'Chaos Elemental', 'Scorpia', 'Venenatis', 'Vet\'ion', 'Callisto']), pass_args=True))
 	updater.dispatcher.add_handler(CommandHandler('f2p', make_hiscore_cmd(['Obor', 'Bryophyta']), pass_args=True))
+	updater.dispatcher.add_handler(CommandHandler('lms', make_hiscore_cmd(['Last Man Standing (LMS)']), pass_args=True))
 	updater.dispatcher.add_handler(CommandHandler('ge', cmd_ge, pass_args=True))
 	updater.dispatcher.add_error_handler(handle_error)
 

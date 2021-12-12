@@ -22,7 +22,7 @@ This is the repository for [@DemonButlerBot](https://t.me/DemonButlerBot), a [Te
 	Show kill-counts for the name you provide, or a specific label if you told the butler to `/remember` your RSN, e.g. `/kc barrows`
 *	`/kchelp`
 	Lists shortcut commands similar to `/kc` for groups of hiscore labels:
-	*	`/gwd`, `/dks`, `/clues`, `/raids`, `/slayer`, `/f2p`
+	*	`/gwd`, `/dks`, `/raids`, `/slayer`, `/f2p`, `/clues`, `/lms`
 *	`/ge <item>`
 	Looks up the current price of an item traded on the Grand Exchange.
 *	`/greeting <greeting>`

@@ -124,7 +124,7 @@ class HiscoreResult(object):
 		bh_labels + \
 		clue_labels + \
 		[ # Minigames
-			'Last Man Standing',
+			'Last Man Standing (LMS)',
 			'Soul Wars Zeal',
 		] + \
 		boss_labels
