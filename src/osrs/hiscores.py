@@ -62,14 +62,14 @@ class HiscoreResult(object):
 		self.skill_entries = []
 		self.skills = {}
 		for skill_label in HiscoreResult.skill_labels:
-			skill_entry = SkillEntry(skill_label, 0, 0, 0)
+			skill_entry = SkillEntry(skill_label, -1, -1, -1)
 			self.skill_entries.append(skill_entry)
 			self.skills[skill_label] = skill_entry
 
 		self.score_entries = []
 		self.scores = {}
 		for score_label in HiscoreResult.score_labels:
-			score_entry = ScoreEntry(score_label, 0, 0)
+			score_entry = ScoreEntry(score_label, -1, -1)
 			self.score_entries.append(score_entry)
 			self.scores[score_label] = score_entry
 

@@ -30,14 +30,14 @@ def cmd_config(update, context):
 
 stat_format = '''[{name}]({url}):
 ```
-{ATT:>2}  ATK| {HIT:>2}   HP| {MIN:>2} MINE
-{STR:>2}  STR| {AGI:>2}  AGI| {SMI:>2} SMTH
-{DEF:>2}  DEF| {HER:>2} HERB| {FIS:>2} FISH
-{RAN:>2} RNGE| {THI:>2} THVG| {COO:>2} COOK
-{PRA:>2} PRAY| {CRA:>2} CRFT| {FIR:>2} FIRE
-{MAG:>2} MAGE| {FLE:>2} FLET| {WOO:>2} WOOD
-{RUN:>2}   RC| {SLA:>2} SLAY| {FAR:>2} FARM
-{CON:>2} CONS| {HUN:>2} HUNT|    {OVE:>4}```'''
+{ATT:>2}  ATK  {HIT:>2}   HP  {MIN:>2} MINE
+{STR:>2}  STR  {AGI:>2}  AGI  {SMI:>2} SMTH
+{DEF:>2}  DEF  {HER:>2} HERB  {FIS:>2} FISH
+{RAN:>2} RNGE  {THI:>2} THVG  {COO:>2} COOK
+{PRA:>2} PRAY  {CRA:>2} CRFT  {FIR:>2} FIRE
+{MAG:>2} MAGE  {FLE:>2} FLET  {WOO:>2} WOOD
+{RUN:>2}   RC  {SLA:>2} SLAY  {FAR:>2} FARM
+{CON:>2} CONS  {HUN:>2} HUNT     {OVE:>4}```'''
 @logged_command
 @util.send_action(telegram.ChatAction.TYPING)
 def cmd_skills(update, context):
@@ -55,7 +55,11 @@ def cmd_skills(update, context):
 			'url': osrs.hiscores.HiscoreResult.get_full_url(player)
 		}
 		for label in osrs.hiscores.HiscoreResult.skill_labels:
-			kwargs[label[:3].upper()] = hiscore.skills[label].level
+			level = hiscore.skills[label].level
+			if level > 0:
+				kwargs[label[:3].upper()] = hiscore.skills[label].level
+			else:
+				kwargs[label[:3].upper()] = ' -'
 		update.message.reply_text(
 			stat_format.format(**kwargs),
 			parse_mode='Markdown',
