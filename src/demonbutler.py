@@ -22,6 +22,10 @@ def cmd_start(update, context):
 	)
 
 @logged_command
+def cmd_version(update, context):
+	update.message.reply_text('I am DemonButlerBot, version ' + VERSION)
+
+@logged_command
 def cmd_help(update, context):
 	update.message.reply_text('I can serve you in the following ways:\n' + \
 		'/remember <name> - Tell me your RSN\n' + \
@@ -29,6 +33,7 @@ def cmd_help(update, context):
 		'/kc <name> - Lookup player boss kc\n' + \
 		'/kchelp - Show kc shortcut commands\n' + \
 		'/ge <item> - Lookup item on [GE](http://services.runescape.com/m=itemdb_oldschool/)\n' + \
+		'/version - Show what version I\'m running\n' + \
 		'\nFor group admins:\n' + \
 		'/greeting - Set new member greeting',
 		parse_mode='Markdown',
@@ -261,6 +266,7 @@ def main(argv):
 	updater = Updater(token=config['telegram']['token'])
 	updater.dispatcher.add_handler(CommandHandler('start', cmd_start))
 	updater.dispatcher.add_handler(CommandHandler('help', cmd_help))
+	updater.dispatcher.add_handler(CommandHandler('version', cmd_version))
 	updater.dispatcher.add_handler(CommandHandler('kchelp', cmd_kchelp))
 	updater.dispatcher.add_handler(CommandHandler('config', cmd_config))
 	updater.dispatcher.add_handler(CommandHandler('skills', cmd_skills, pass_args=True))
