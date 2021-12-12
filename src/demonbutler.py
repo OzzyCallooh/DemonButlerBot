@@ -12,7 +12,7 @@ import rememberaccount
 import util
 from cmdlogging import logged_command
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 
 @logged_command
 def cmd_start(update, context):
@@ -30,8 +30,7 @@ def cmd_help(update, context):
 	update.message.reply_text('I can serve you in the following ways:\n' + \
 		'/remember <name> - Tell me your RSN\n' + \
 		'/skills <name> - Lookup player levels\n' + \
-		'/kc <name> - Lookup player boss kc\n' + \
-		'/kchelp - Show kc shortcut commands\n' + \
+		'/kchelp - Explains /kc, which looks up boss kc\n' + \
 		'/ge <item> - Lookup item on [GE](http://services.runescape.com/m=itemdb_oldschool/)\n' + \
 		'/version - Show what version I\'m running\n' + \
 		'\nFor group admins:\n' + \
@@ -42,10 +41,16 @@ def cmd_help(update, context):
 
 @logged_command
 def cmd_kchelp(update, context):
-	update.message.reply_text('I recognize the following kill-count commands. ' + \
-		'Put the player\'s name after the command (or tell me to /remember yours):\n' + \
-		'/kc - Show all kcs\n' + \
-		'/kc <label> - Show one of your kcs (requires /remember)\n' + \
+	update.message.reply_text(
+		'`/kc <name>`\n' + \
+		'`/kc <name>, <label>`\n' + \
+		'`/kc <label>` (if you used /remember)\n' + \
+		'\n' + \
+		'Looks up a name on the hiscores and queries one or more kill-count labels.' + \
+		' For non-private chats, long results won\'t send unless you use "all" for the label.' + \
+		'\n\nShortcuts:\n' + \
+		'/clues - Clue Scroll completions (by tier)\n' + \
+		'/lms - Last Man Standing rank\n' + \
 		'/gwd - God Wars Dungeon\n' + \
 		'/raids - Raids (CoX, ToB)\n' + \
 		'/slayer - Slayer Bosses\n' + \
@@ -137,6 +142,9 @@ def make_hiscore_cmd(labels):
 				if label_input == '':
 					label_input = 'all'
 					implicit_all = True
+			elif arg_str.strip().lower() == 'help':
+				cmd_kchelp(update, context)
+				return
 			else:
 				if assume_player_query:
 					# /lms Salty Hyena
@@ -160,6 +168,15 @@ def make_hiscore_cmd(labels):
 			# /kc
 			player = rememberaccount.get_rs_username(update.message.from_user.id)
 			implicit_all = True
+
+			if not player:
+				update.message.reply_text(
+					'Put an Old School RuneScape account username (RSN) after the command.' + \
+					' You can also tell me to /remember a specific RSN.' + \
+					(' If you want a specific hiscore label too, put a comma and then the label.' if not assume_player_query else '') + \
+					' Use /kchelp for more info.'
+				)
+				return
 
 		logging.debug('player: {player}, label_input: {label_input}'.format(
 			player=player,
