@@ -107,38 +107,82 @@ def cmd_skills(update, context):
 			player=player
 		))
 
+cmd_args = re.compile('/\S+\s+(.+)')
 
 non_alnum = re.compile('\W')
 def make_hiscore_cmd(labels):
+	assume_player_query = True
+	if labels == None:
+		labels = osrs.hiscores.HiscoreResult.score_labels
+		assume_player_query = False
+
 	kc_format = '''[{name}]({url}):'''
 	@logged_command
 	@util.send_action(telegram.ChatAction.TYPING)
 	def cmd_kc(update, context):
-		args = context.args
+		player = None
+		label_input = 'all'
+		implicit_all = False
 
-		player = rememberaccount.get_rs_username(update.message.from_user.id)
+		arg_str = None
+		arg_match = re.match(cmd_args, update.message.text)
+		if arg_match:
+			arg_str = arg_match.group(1)
 
-		labels_lookup = labels
-
-		if player == None:
-			if len(args) > 0:
-				player = ' '.join(args)
+			if ',' in arg_str:
+				# /kc Iron Yeen, Kree'Arra
+				player, label_input = arg_str.split(',')
+				player = player.strip()
+				label_input = label_input.strip().lower()
+				if label_input == '':
+					label_input = 'all'
+					implicit_all = True
 			else:
-				update.message.reply_text('Please use /skills followed by the name of ' + \
-					'the player you wish to look up.')
-				return
+				if assume_player_query:
+					# /lms Salty Hyena
+					player = arg_str.strip()
+					label_input = 'all'
+					implicit_all = True
+				else:
+					player = rememberaccount.get_rs_username(update.message.from_user.id)
+					if player:
+						# /kc Kree'Arra
+						label_input = arg_str.strip().lower()
+						if label_input == '':
+							label_input = 'all'
+							implicit_all = True
+					else:
+						# /kc MyFriendsRSN
+						player = arg_str.strip()
+						label_input = 'all'
+						implicit_all = True
 		else:
-			if len(args) > 0:
-				arg = ' '.join(args)
-				labels_lookup = []
-				for label in labels:
-					if re.sub(non_alnum, '', arg).lower() in re.sub(non_alnum, '', label).lower():
-						labels_lookup.append(label)
-						if len(labels_lookup) >= 4:
-							break
-				if len(labels_lookup) == 0:
-					update.message.reply_text('I don\'t recognize what you are referring to.')
-					return
+			# /kc
+			player = rememberaccount.get_rs_username(update.message.from_user.id)
+			implicit_all = True
+
+		logging.debug('player: {player}, label_input: {label_input}'.format(
+			player=player,
+			label_input=label_input
+		))
+
+		labels_lookup = None
+		if label_input.lower() == 'all':
+			labels_lookup = labels
+		else:
+			labels_lookup = []
+			for label in labels:
+				if re.sub(non_alnum, '', label_input).lower() in re.sub(non_alnum, '', label).lower():
+					labels_lookup.append(label)
+					if len(labels_lookup) >= 4:
+						break
+
+		if len(labels_lookup) == 0:
+			update.message.reply_text(
+				'I\'m not sure which hiscore labels you want.\n\n' + \
+				'If you want to search for an RSN, put a comma at the end of your message.'
+			)
+			return
 
 		hiscore = osrs.hiscores.HiscoreResult.lookup(player)
 		if hiscore:
@@ -161,6 +205,13 @@ def make_hiscore_cmd(labels):
 						label=label,
 						score=score
 					))
+				if count > 9 and update.message.chat.type != 'private' and implicit_all:
+					update.message.reply_text(
+						'I understood your request, but the result contained many hiscore labels. ' + \
+						'Since this isn\'t a private chat, please use "all" for your label query to explicitly allow this.'
+					)
+					return
+
 			if count > 0:
 				update.message.reply_text(
 					'\n'.join(lines),
@@ -271,7 +322,7 @@ def main(argv):
 	updater.dispatcher.add_handler(CommandHandler('config', cmd_config))
 	updater.dispatcher.add_handler(CommandHandler('skills', cmd_skills, pass_args=True))
 	updater.dispatcher.add_handler(CommandHandler('stats', cmd_skills, pass_args=True))
-	updater.dispatcher.add_handler(CommandHandler('kc', make_hiscore_cmd(osrs.hiscores.HiscoreResult.score_labels), pass_args=True))
+	updater.dispatcher.add_handler(CommandHandler('kc', make_hiscore_cmd(None), pass_args=True))
 	updater.dispatcher.add_handler(CommandHandler('clues', make_hiscore_cmd(
 		[
 			('Clue Scrolls (beginner)','Beginner'),
