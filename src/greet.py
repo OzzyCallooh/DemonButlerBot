@@ -28,21 +28,21 @@ def get_greeting(chat_id):
 	).one_or_none()
 	return greetcfg.greeting if greetcfg else None
 
-def im_in_a_new_chat(bot, update):
+def im_in_a_new_chat(update, context):
 	logging.info('Bot was added to chat: ' + str(update.effective_message.chat_id))
 	update.message.reply_text('Hello, I am Alathazdrar the demon butler. ' + \
 		' Thank you for hiring me for this group chat. I am at your service. ' + \
 		' Type /help to see what I can do.')
 
-def handle_new_chat_member(bot, update):
+def handle_new_chat_member(update, context):
 	if len(update.message.new_chat_members) <= 0:
 		return
 
 	# Ignore bot additions
 	has_non_bot = False
 	for user in update.message.new_chat_members:
-		if user.is_bot and user.id == bot.id:
-			im_in_a_new_chat(bot, update)
+		if user.is_bot and user.id == context.bot.id:
+			im_in_a_new_chat(update, context)
 		if not user.is_bot:
 			has_non_bot = True
 			break
@@ -59,7 +59,7 @@ def handle_new_chat_member(bot, update):
 
 @logged_command
 @require_group_admin
-def cmd_greeting(bot, update):
+def cmd_greeting(update, context):
 	session = database.dbsession()
 
 	# Query db for greeting
