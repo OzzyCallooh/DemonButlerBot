@@ -1,3 +1,5 @@
+import re
+
 from sqlalchemy import Column, BigInteger, String
 from telegram.ext import CommandHandler
 
@@ -27,6 +29,10 @@ def get_rs_username(tg_user_id, session=None):
 	ra = get_remembered_account(tg_user_id, session)
 	return ra.rs_username if ra else None
 
+invalid_rsn_chars = re.compile('[^\w _]')
+def is_valid_rsn(rs_username):
+	return re.search(invalid_rsn_chars, rs_username) == None
+
 def cmd_remember(update, context):
 	args = context.args
 	rs_username = (' '.join(args))[:30]
@@ -35,6 +41,10 @@ def cmd_remember(update, context):
 	session = database.dbsession()
 	if rs_username != '':
 		# Set remembered username
+		if not is_valid_rsn(rs_username):
+			update.message.reply_text('That doesn\'t look like a valid RSN.')
+			session.close()
+			return
 
 		ra = get_remembered_account(tg_user_id, session=session)
 		if ra == None:
