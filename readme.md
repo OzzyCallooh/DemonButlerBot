@@ -36,11 +36,11 @@ If `telegram.use_webhooks` is true, the bot will use an internal HTTP server to 
 
 ## Running the Bot
 
-Run the bot using Python 3.5 or later via the command line, and provide the configuration file as the first arg:
+Set the `CONFIG` environment variable to point to your config file (default is `config/default.config.json`). Run the bot using GNU make. A virtual environment is automatically set up using [Makefile.venv](https://github.com/sio/Makefile.venv), which has other variables to configure like `PY` (default `python3`).
 
 ```bash
-python3 src/demonbutler.py config/dev.config.json
-```
+$ make run
+````
 
 ## License
 

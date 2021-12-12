@@ -1,0 +1,3 @@
+[submodule "dev/Makefile.venv"]
+	path = dev/Makefile.venv
+	url = https://github.com/sio/Makefile.venv
