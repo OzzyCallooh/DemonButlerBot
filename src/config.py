@@ -18,12 +18,12 @@ def get_admin_ids(bot, chat_id):
 
 def require_group_admin(func):
 	@wraps(wraps)
-	def wrapped(bot, update, *args, **kwargs):
+	def wrapped(update, context, *args, **kwargs):
 		user_id = update.effective_user.id
 		chat_id = update.effective_chat.id
 
-		if user_id in get_admin_ids(bot, chat_id):
-			return func(bot, update, *args, **kwargs)
+		if user_id in get_admin_ids(context.bot, chat_id):
+			return func(update, context, *args, **kwargs)
 		else:
 			update.message.reply_text('I\'m sorry mortal, but I cannot honor that request.')
 			return
