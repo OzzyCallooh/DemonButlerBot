@@ -58,7 +58,9 @@ def cmd_remember(update, context):
 			'*{}*\n\n'.format(
 				rs_username
 			) + \
-			'You can tell me to /forget this, or use /remember again to recall or change it.',
+			'I\'ll assume you want to use this name for commands like /skills from now on. ' + \
+			'When you use /kc now, give me a hiscores label instead of an RSN. ' + \
+			'You can tell me to /forget your RSN, or use /remember again to recall or change it.',
 			parse_mode='Markdown'
 		)
 
