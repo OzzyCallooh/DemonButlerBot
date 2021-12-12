@@ -13,12 +13,36 @@ from cmdlogging import logged_command
 VERSION = "1.0.0"
 
 @logged_command
-	update.message.reply_text('Greetings, mortal. I can serve you in the following ways:\n' + \
-		'/stats <name> - Lookup player levels\n' + \
 def cmd_start(update, context):
+	update.message.reply_text('Greetings, mortal. Type /help to see a list of commands I can recognize.',
+		parse_mode='Markdown',
+		disable_web_page_preview=True
+	)
+
+@logged_command
+def cmd_help(update, context):
+	update.message.reply_text('I can serve you in the following ways:\n' + \
+		'/skills <name> - Lookup player levels\n' + \
+		'/kc <name> - Lookup player boss kc\n' + \
+		'/kchelp - Show kc shortcut commands\n' + \
 		'/ge <item> - Lookup item on [GE](http://services.runescape.com/m=itemdb_oldschool/)\n' + \
-		'/greeting - Set new member greeting\\*\n' + \
-		'\\*Must be admin of group chat',
+		'\nFor group admins:\n' + \
+		'/greeting - Set new member greeting',
+		parse_mode='Markdown',
+		disable_web_page_preview=True
+	)
+
+@logged_command
+def cmd_kchelp(update, context):
+	update.message.reply_text('I recognize the following kill-count commands. Put the player\'s ' + \
+		'name after the command:\n' + \
+		'/kc - Show all\n' + \
+		'/gwd - God Wars Dungeon\n' + \
+		'/raids - Raids (CoX, ToB)\n' + \
+		'/slayer - Slayer Bosses\n' + \
+		'/f2p - F2P Bosses (Obor, Bryo)\n' + \
+		'/clues - Clue scrolls\n' + \
+		'/wildy - Wilderness bosses',
 		parse_mode='Markdown',
 		disable_web_page_preview=True
 	)
@@ -43,7 +67,7 @@ stat_format = '''[{name}]({url}):
 def cmd_skills(update, context):
 	args = context.args
 	if len(args) == 0:
-		update.message.reply_text('Please use /stats followed by the name of ' + \
+		update.message.reply_text('Please use /skills followed by the name of ' + \
 			'the player you wish to look up.')
 		return
 
