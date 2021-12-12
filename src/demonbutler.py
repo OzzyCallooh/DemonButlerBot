@@ -213,8 +213,9 @@ def make_hiscore_cmd(labels):
 					return
 
 			if count > 0:
+				message = ('\n' if len(lines) > 2 else ' ').join(lines)
 				update.message.reply_text(
-					'\n'.join(lines),
+					message,
 					parse_mode='Markdown',
 					disable_web_page_preview=True
 				)
