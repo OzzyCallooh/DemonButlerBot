@@ -1,12 +1,14 @@
 import sys
+import re
 import logging
 import telegram
 from telegram.ext import Updater, CommandHandler
 
 from config import config, require_permission
 import osrs
-import greet
 import database
+import greet
+import rememberaccount
 import util
 from cmdlogging import logged_command
 
@@ -22,6 +24,7 @@ def cmd_start(update, context):
 @logged_command
 def cmd_help(update, context):
 	update.message.reply_text('I can serve you in the following ways:\n' + \
+		'/remember <name> - Tell me your RSN\n' + \
 		'/skills <name> - Lookup player levels\n' + \
 		'/kc <name> - Lookup player boss kc\n' + \
 		'/kchelp - Show kc shortcut commands\n' + \
@@ -34,9 +37,10 @@ def cmd_help(update, context):
 
 @logged_command
 def cmd_kchelp(update, context):
-	update.message.reply_text('I recognize the following kill-count commands. Put the player\'s ' + \
-		'name after the command:\n' + \
-		'/kc - Show all\n' + \
+	update.message.reply_text('I recognize the following kill-count commands. ' + \
+		'Put the player\'s name after the command (or tell me to /remember yours):\n' + \
+		'/kc - Show all kcs\n' + \
+		'/kc <label> - Show one of your kcs (requires /remember)\n' + \
 		'/gwd - God Wars Dungeon\n' + \
 		'/raids - Raids (CoX, ToB)\n' + \
 		'/slayer - Slayer Bosses\n' + \
@@ -66,12 +70,15 @@ stat_format = '''[{name}]({url}):
 @util.send_action(telegram.ChatAction.TYPING)
 def cmd_skills(update, context):
 	args = context.args
-	if len(args) == 0:
-		update.message.reply_text('Please use /skills followed by the name of ' + \
-			'the player you wish to look up.')
-		return
 
 	player = ' '.join(args)
+	if len(args) == 0:
+		player = rememberaccount.get_rs_username(update.message.from_user.id)
+		if player == None:
+			update.message.reply_text('Please use /skills followed by the name of ' + \
+				'the player you wish to look up.')
+			return
+
 	hiscore = osrs.hiscores.HiscoreResult.lookup(player)
 	if hiscore:
 		kwargs = {
@@ -96,17 +103,38 @@ def cmd_skills(update, context):
 		))
 
 
+non_alnum = re.compile('\W')
 def make_hiscore_cmd(labels):
 	kc_format = '''[{name}]({url}):'''
 	@logged_command
 	@util.send_action(telegram.ChatAction.TYPING)
 	def cmd_kc(update, context):
 		args = context.args
-		if len(args) == 0:
-			update.message.reply_text('Put the name of the player you wish to look up after the command.')
-			return
 
-		player = ' '.join(args)
+		player = rememberaccount.get_rs_username(update.message.from_user.id)
+
+		labels_lookup = labels
+
+		if player == None:
+			if len(args) > 0:
+				player = ' '.join(args)
+			else:
+				update.message.reply_text('Please use /skills followed by the name of ' + \
+					'the player you wish to look up.')
+				return
+		else:
+			if len(args) > 0:
+				arg = ' '.join(args)
+				labels_lookup = []
+				for label in labels:
+					if re.sub(non_alnum, '', arg).lower() in re.sub(non_alnum, '', label).lower():
+						labels_lookup.append(label)
+						if len(labels_lookup) >= 4:
+							break
+				if len(labels_lookup) == 0:
+					update.message.reply_text('I don\'t recognize what you are referring to.')
+					return
+
 		hiscore = osrs.hiscores.HiscoreResult.lookup(player)
 		if hiscore:
 			lines = []
@@ -115,7 +143,7 @@ def make_hiscore_cmd(labels):
 				url=osrs.hiscores.HiscoreResult.get_full_url(player)
 			))
 			count = 0
-			for label in labels:
+			for label in labels_lookup:
 				score_label = label
 				if type(label) == tuple:
 					score_label = label[0]
@@ -124,7 +152,7 @@ def make_hiscore_cmd(labels):
 				score = hiscore.scores[score_label].score
 				if score >= 0:
 					count += 1
-					lines.append('{label}: {score}'.format(
+					lines.append('{label}: *{score}*'.format(
 						label=label,
 						score=score
 					))
@@ -270,6 +298,9 @@ def main(argv):
 
 	# Greeting
 	greet.setup_dispatcher(updater.dispatcher)
+
+	# Remember account
+	rememberaccount.setup_dispatcher(updater.dispatcher)
 
 	# Let's get started
 	if config['telegram']['use_webhook']:
