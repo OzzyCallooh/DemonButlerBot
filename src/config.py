@@ -34,7 +34,7 @@ def get_user_perms(user):
 	perms = config['permissions']['*']
 	# If entry exists by username or user id, use that instead
 	if user.username in config['permissions']:
-		perms = config['permissions'][update.effective_user.username]
+		perms = config['permissions'][user.username]
 	if str(user.id) in config['permissions']:
 		perms = config['permissions'][str(user.id)]
 	return perms
