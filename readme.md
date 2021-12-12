@@ -11,9 +11,18 @@ This is the repository for [@DemonButlerBot](https://t.me/DemonButlerBot), a [Te
 ## Commands
 
 *	`/start`
-	The butler will greet you and tell you what commands you can give him.
-*	`/stats <name>`
-	Looks up the stats of the player with the given `<name>`. Example: `/stats Zezima`
+	The butler will greet you!
+*	`/help`
+	Show a list of basic commands.
+*	`/remember <name>`
+	Tell the butler your RSN so it can remember it for name-based commands, or recall what you told the butler. You can also tell him to `/forget` it.
+*	`/skills <name>`
+	Looks up the stats of the player with the given `<name>`, or your remembered name. Example: `/stats Zezima`
+*	`/kc <name>` or `/kc <label>`
+	Show kill-counts for the name you provide, or a specific label if you told the butler to `/remember` your RSN, e.g. `/kc barrows`
+*	`/kchelp`
+	Lists shortcut commands similar to `/kc` for groups of hiscore labels:
+	*	`/gwd`, `/dks`, `/clues`, `/raids`, `/slayer`, `/f2p`
 *	`/ge <item>`
 	Looks up the current price of an item traded on the Grand Exchange.
 *	`/greeting <greeting>`
