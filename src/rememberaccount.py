@@ -54,7 +54,7 @@ def cmd_remember(update, context):
 		session.add(ra)
 		session.commit()
 		update.message.reply_text(
-			'OK, I will remember your Old School RuneScape username:\n' + \
+			'OK, I will remember your Old School RuneScape username (RSN): ' + \
 			'*{}*\n\n'.format(
 				rs_username
 			) + \
@@ -66,7 +66,7 @@ def cmd_remember(update, context):
 		rs_username = get_rs_username(tg_user_id)
 		if rs_username:
 			update.message.reply_text(
-				'I am remembering this Old School RuneScape account username for you:\n' + \
+				'I am remembering this Old School RuneScape account username (RSN) for you: ' + \
 				'*{}*\n\n'.format(
 					rs_username
 				) + \
@@ -75,7 +75,7 @@ def cmd_remember(update, context):
 			)
 		else:
 			update.message.reply_text(
-				'Put your Old School RuneScape account username after the command and I\'ll remember it.'
+				'Put your Old School RuneScape account username (RSN) after the command and I\'ll remember it.'
 			)
 	session.close()
 
@@ -87,9 +87,9 @@ def cmd_forget(update, context):
 	if ra:
 		session.delete(ra)
 		session.commit()
-		update.message.reply_text('OK, I forgot your Old School RuneScape account username. Set it again using /remember')
+		update.message.reply_text('OK, I forgot your Old School RuneScape account username (RSN). Set it again using /remember')
 	else:
-		update.message.reply_text('I am not remembering any Old School RuneScape account username for you.')
+		update.message.reply_text('I am not remembering any Old School RuneScape account username (RSN) for you.')
 	session.close()
 
 def setup_dispatcher(dispatcher):
