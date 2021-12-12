@@ -53,10 +53,83 @@ class HiscoreResult(object):
 	'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore',
 	'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecraft', 'Hunter',
 	'Construction']
-	score_labels = ['LMS', 'Bounty Hunter (hunter)', 'Bounty Hunter (rogue)', 
-	'Clue Scrolls (all)', 'Clue Scrolls (beginner)', 'Clue Scrolls (easy)',
-	'Clue Scrolls (medium)', 'Clue Scrolls (hard)', 'Clue Scrolls (elite)',
-	'Clue Scrolls (master)']
+
+	clue_labels = [
+		'Clue Scrolls (all)',
+		'Clue Scrolls (beginner)',
+		'Clue Scrolls (easy)',
+		'Clue Scrolls (medium)',
+		'Clue Scrolls (hard)',
+		'Clue Scrolls (elite)',
+		'Clue Scrolls (master)'
+	]
+
+	boss_labels = [
+		'Abyssal Sire',
+		'Alchemical Hydra',
+		'Barrows',
+		'Bryophyta',
+		'Callisto',
+		'Cerberus',
+		'Chambers of Xeric',
+		'Chambers of Xeric (Challenge Mode)',
+		'Chaos Elemental',
+		'Chaos Fanatic',
+		'Commander Zilyana',
+		'Coporeal Beast',
+		'Crazy Archaeologist',
+		'Dagannoth Prime',
+		'Dagannoth Rex',
+		'Dagannoth Supreme',
+		'Deranged Archaeologist',
+		'General Graardor',
+		'Giant Mole',
+		'Grotesque Guardians',
+		'Hespori',
+		'Kalphite Queen',
+		'King Black Dragon',
+		'Kraken',
+		'Kree\'Arra',
+		'K\'ril Tsutsaroth',
+		'Mimic',
+		'Nightmare',
+		'Phosani\'s Nightmare',
+		'Obor',
+		'Sarachnis',
+		'Scorpia',
+		'Skotizo',
+		'Tempoross',
+		'Gauntlet',
+		'Corrupted Gauntlet',
+		'Theatre of Blood',
+		'Theatre of Blood (Hard Mode)',
+		'Thermonuclear Smoke Devil',
+		'TzKal-Zuk',
+		'TzTok-Jad',
+		'Venenatis',
+		'Vet\'ion',
+		'Vorkath',
+		'Wintertodt',
+		'Zalcano',
+		'Zulrah'
+	]
+
+	bh_labels = [
+		'Bounty Hunter (rogue)',
+		'Bounty Hunter (hunter)'
+	]
+
+	score_labels = \
+		[ 'League Points' ] + \
+		bh_labels + \
+		clue_labels + \
+		[ # Minigames
+			'Last Man Standing',
+			'Soul Wars Zeal',
+		] + \
+		boss_labels
+
+	
 
 	def __init__(self):
 		self.skill_entries = []
@@ -81,23 +154,19 @@ class HiscoreResult(object):
 			# parse values on line as ints
 			#print('line {}: {}'.format(line_no, lines[line_no]))
 			values = [int(x) if x is not '' else 0 for x in lines[line_no].split(',')]
-			if line_no >= 0 and line_no < 24:
+			if line_no < 24:
 				# lines[0] to lines[23] are skills
 				idx = line_no
 				skill_entry = self.skill_entries[idx]
 				skill_entry.rank = values[0]
 				skill_entry.level = values[1]
 				skill_entry.xp = values[2]
-				#print(str(skill_entry))
-			elif line_no >= 24 and line_no < 34:
-				# lines[24] to lines[34] are generic scores
+			elif line_no < 83:
+				# lines[24] to lines[83] are generic scores
 				idx = line_no - 24
 				score_entry = self.score_entries[idx]
 				score_entry.rank = values[0]
 				score_entry.score = values[1]
-				#print(str(score_entry))
-			else:
-				pass
 		return self
 
 	@staticmethod

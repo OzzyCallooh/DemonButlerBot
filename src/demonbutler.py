@@ -95,6 +95,58 @@ def cmd_skills(update, context):
 			player=player
 		))
 
+
+def make_hiscore_cmd(labels):
+	kc_format = '''[{name}]({url}):'''
+	@logged_command
+	@util.send_action(telegram.ChatAction.TYPING)
+	def cmd_kc(update, context):
+		args = context.args
+		if len(args) == 0:
+			update.message.reply_text('Put the name of the player you wish to look up after the command.')
+			return
+
+		player = ' '.join(args)
+		hiscore = osrs.hiscores.HiscoreResult.lookup(player)
+		if hiscore:
+			lines = []
+			lines.append(kc_format.format(
+				name=player,
+				url=osrs.hiscores.HiscoreResult.get_full_url(player)
+			))
+			count = 0
+			for label in labels:
+				score_label = label
+				if type(label) == tuple:
+					score_label = label[0]
+					label = label[1]
+
+				score = hiscore.scores[score_label].score
+				if score >= 0:
+					count += 1
+					lines.append('{label}: {score}'.format(
+						label=label,
+						score=score
+					))
+			if count > 0:
+				update.message.reply_text(
+					'\n'.join(lines),
+					parse_mode='Markdown',
+					disable_web_page_preview=True
+				)
+			else:
+				update.message.reply_text(
+					'That account is not ranked on the hiscores for that.',
+					parse_mode='Markdown',
+					disable_web_page_preview=True
+				)
+		else:
+			update.message.reply_text('Unfortunately, mortal, there is no such being ' + \
+				'who goes by the name "{player}".'.format(
+				player=player
+			))
+	return cmd_kc
+
 @logged_command
 @util.send_action(telegram.ChatAction.TYPING)
 def cmd_ge(update, context):
@@ -166,6 +218,7 @@ def handle_error(update, context):
 	logging.error(str(error))
 	update.message.reply_text('I\'m sorry, there seems to be a magical force ' + \
 		'preventing me from doing my job. I have alerted my master.')
+	raise error
 
 def main(argv):
 	# Logging
@@ -179,8 +232,39 @@ def main(argv):
 	logging.debug('Initializing updater')
 	updater = Updater(token=config['telegram']['token'])
 	updater.dispatcher.add_handler(CommandHandler('start', cmd_start))
+	updater.dispatcher.add_handler(CommandHandler('help', cmd_help))
+	updater.dispatcher.add_handler(CommandHandler('kchelp', cmd_kchelp))
 	updater.dispatcher.add_handler(CommandHandler('config', cmd_config))
-	updater.dispatcher.add_handler(CommandHandler('stats', cmd_stats, pass_args=True))
+	updater.dispatcher.add_handler(CommandHandler('skills', cmd_skills, pass_args=True))
+	updater.dispatcher.add_handler(CommandHandler('stats', cmd_skills, pass_args=True))
+	updater.dispatcher.add_handler(CommandHandler('kc', make_hiscore_cmd(osrs.hiscores.HiscoreResult.score_labels), pass_args=True))
+	updater.dispatcher.add_handler(CommandHandler('clues', make_hiscore_cmd(
+		[
+			('Clue Scrolls (beginner)','Beginner'),
+			('Clue Scrolls (easy)','Easy'),
+			('Clue Scrolls (medium)','Medium'),
+			('Clue Scrolls (hard)','Hard'),
+			('Clue Scrolls (elite)','Elite'),
+			('Clue Scrolls (master)','Master'),
+			('Clue Scrolls (all)', 'Total')
+		]), pass_args=True)
+	)
+	updater.dispatcher.add_handler(CommandHandler('gwd', make_hiscore_cmd(['General Graardor', 'Kree\'Arra', 'Commander Zilyana', 'K\'ril Tsutsaroth']), pass_args=True))
+	updater.dispatcher.add_handler(CommandHandler('dks', make_hiscore_cmd(
+		[
+			('Dagannoth Prime', 'Prime'),
+			('Dagannoth Rex', 'Rex'),
+			('Dagannoth Supreme', 'Supreme')
+		]), pass_args=True)
+	)
+	updater.dispatcher.add_handler(CommandHandler('raids', make_hiscore_cmd(
+		[
+			'Chambers of Xeric', 'Chambers of Xeric (Challenge Mode)',
+			'Theatre of Blood', 'Theatre of Blood (Hard Mode)'
+		]), pass_args=True))
+	updater.dispatcher.add_handler(CommandHandler('slayer', make_hiscore_cmd(['Grotesque Guardians', 'Cerberus', 'Kraken', 'Alchemical Hydra']), pass_args=True))
+	updater.dispatcher.add_handler(CommandHandler('wildy', make_hiscore_cmd(['Crazy Archaeologist', 'Chaos Fanatic', 'Chaos Elemental', 'Scorpia', 'Venenatis', 'Vet\'ion', 'Callisto']), pass_args=True))
+	updater.dispatcher.add_handler(CommandHandler('f2p', make_hiscore_cmd(['Obor', 'Bryophyta']), pass_args=True))
 	updater.dispatcher.add_handler(CommandHandler('ge', cmd_ge, pass_args=True))
 	updater.dispatcher.add_error_handler(handle_error)
 
