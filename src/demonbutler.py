@@ -40,7 +40,6 @@ stat_format = '''[{name}]({url}):
 {CON:>2} CONS| {HUN:>2} HUNT|    {OVE:>4}```'''
 @logged_command
 @util.send_action(telegram.ChatAction.TYPING)
-	#print('/stats')
 def cmd_skills(update, context):
 	args = context.args
 	if len(args) == 0:
@@ -49,9 +48,7 @@ def cmd_skills(update, context):
 		return
 
 	player = ' '.join(args)
-	#print('Looking up...')
 	hiscore = osrs.hiscores.HiscoreResult.lookup(player)
-	#print('Done!')
 	if hiscore:
 		kwargs = {
 			'name': player,
@@ -72,7 +69,6 @@ def cmd_skills(update, context):
 
 @logged_command
 @util.send_action(telegram.ChatAction.TYPING)
-	#print('/ge')
 def cmd_ge(update, context):
 	args = context.args
 	if len(args) == 0:
