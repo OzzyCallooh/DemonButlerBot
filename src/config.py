@@ -46,9 +46,9 @@ def user_has_permission(user, permission):
 def require_permission(permission):
 	def deco(func):
 		@wraps(wraps)
-		def wrapped(bot, update, *args, **kwargs):
+		def wrapped(update, context, *args, **kwargs):
 			if user_has_permission(update.effective_user, permission):
-				return func(bot, update, *args, **kwargs)
+				return func(update, context, *args, **kwargs)
 			else:
 				update.message.reply_text(config['permission_denied'])
 				return

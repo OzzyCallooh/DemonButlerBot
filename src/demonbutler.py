@@ -13,9 +13,9 @@ from cmdlogging import logged_command
 VERSION = "1.0.0"
 
 @logged_command
-def cmd_start(bot, update):
 	update.message.reply_text('Greetings, mortal. I can serve you in the following ways:\n' + \
 		'/stats <name> - Lookup player levels\n' + \
+def cmd_start(update, context):
 		'/ge <item> - Lookup item on [GE](http://services.runescape.com/m=itemdb_oldschool/)\n' + \
 		'/greeting - Set new member greeting\\*\n' + \
 		'\\*Must be admin of group chat',
@@ -25,7 +25,7 @@ def cmd_start(bot, update):
 
 @logged_command
 @require_permission('operator')
-def cmd_config(bot, update):
+def cmd_config(update, context):
 	update.message.reply_text('Nothing interesting happens.')
 
 stat_format = '''[{name}]({url}):
@@ -40,8 +40,9 @@ stat_format = '''[{name}]({url}):
 {CON:>2} CONS| {HUN:>2} HUNT|    {OVE:>4}```'''
 @logged_command
 @util.send_action(telegram.ChatAction.TYPING)
-def cmd_stats(bot, update, args):
 	#print('/stats')
+def cmd_skills(update, context):
+	args = context.args
 	if len(args) == 0:
 		update.message.reply_text('Please use /stats followed by the name of ' + \
 			'the player you wish to look up.')
@@ -71,8 +72,9 @@ def cmd_stats(bot, update, args):
 
 @logged_command
 @util.send_action(telegram.ChatAction.TYPING)
-def cmd_ge(bot, update, args):
 	#print('/ge')
+def cmd_ge(update, context):
+	args = context.args
 	if len(args) == 0:
 		update.message.reply_text('Please use /ge followed by the name of ' + \
 			'the item for which you wish to search.')
@@ -135,7 +137,8 @@ def cmd_ge(bot, update, args):
 		update.message.reply_text('Unfortunately, mortal, I could not access the ' + \
 			'Grand Exchange prices for that item at this time.')
 
-def handle_error(bot, update, error):
+def handle_error(update, context):
+	error = context.error
 	logging.error(str(error))
 	update.message.reply_text('I\'m sorry, there seems to be a magical force ' + \
 		'preventing me from doing my job. I have alerted my master.')

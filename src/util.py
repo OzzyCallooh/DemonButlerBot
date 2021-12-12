@@ -3,12 +3,12 @@ from functools import wraps
 def send_action(action):
 	def deco(func):
 		@wraps(func)
-		def wrapper(bot, update, *args, **kwargs):
-			bot.send_chat_action(
+		def wrapper(update, context, *args, **kwargs):
+			context.bot.send_chat_action(
 				chat_id=update.effective_message.chat_id,
 				action=action
 			)
-			return func(bot, update, *args, **kwargs)
+			return func(update, context, *args, **kwargs)
 		return wrapper
 	return deco
 
