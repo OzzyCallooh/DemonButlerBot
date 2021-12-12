@@ -1,12 +1,12 @@
-import sqlalchemy
-import sqlalchemy.orm
-import sqlalchemy.ext.declarative
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 from config import config
 
-engine = sqlalchemy.create_engine(config['database']['uri'])
-dbsession = sqlalchemy.orm.sessionmaker(bind=engine)
-Base = sqlalchemy.ext.declarative.declarative_base()
+engine = create_engine(config['database']['uri'])
+dbsession = sessionmaker(bind=engine)
+Base = declarative_base()
 
 def init():
 	Base.metadata.create_all(engine)
