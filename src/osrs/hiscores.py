@@ -76,7 +76,7 @@ class HiscoreResult(object):
 		'Chaos Elemental',
 		'Chaos Fanatic',
 		'Commander Zilyana',
-		'Coporeal Beast',
+		'Corporeal Beast',
 		'Crazy Archaeologist',
 		'Dagannoth Prime',
 		'Dagannoth Rex',
