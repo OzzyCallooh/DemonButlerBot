@@ -18,8 +18,9 @@ This is the repository for [@DemonButlerBot](https://t.me/DemonButlerBot), a [Te
 	Tell the butler your RSN so it can remember it for name-based commands, or recall what you told the butler. You can also tell him to `/forget` it.
 *	`/skills <name>`
 	Looks up the stats of the player with the given `<name>`, or your remembered name. Example: `/stats Zezima`
-*	`/kc <name>` or `/kc <label>`
+*	`/kc <name>`, `/kc <name>, <label>`, or `/kc <label>` (after `/remember`)
 	Show kill-counts for the name you provide, or a specific label if you told the butler to `/remember` your RSN, e.g. `/kc barrows`
+	*	Outside of private chats, long messages won't send to prevent spam. You can override this by using `all` for `<label>`.
 *	`/kchelp`
 	Lists shortcut commands similar to `/kc` for groups of hiscore labels:
 	*	`/gwd`, `/dks`, `/raids`, `/slayer`, `/f2p`, `/clues`, `/lms`
