@@ -384,12 +384,12 @@ def main(argv):
 		updater.start_webhook(
 			listen='127.0.0.1',
 			port=config['telegram']['webhook']['internal_port'],
-			url_path=config['telegram']['token']
-		)
-		updater.bot.set_webhook(
-			url='https://' + config['telegram']['webhook']['host'] + \
+			url_path=config['telegram']['token'],
+			cert=config['telegram']['webhook']['cert'],
+			key=config['telegram']['webhook']['key'],
+			webhook_url='https://' + config['telegram']['webhook']['host'] + \
 			    '/' + config['telegram']['token'],
-			certificate=open(config['telegram']['webhook']['cert'], 'rb')
+			drop_pending_updates=True
 		)
 	else:
 		logging.debug('Start polling')
