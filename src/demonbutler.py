@@ -12,7 +12,7 @@ import rememberaccount
 import util
 from cmdlogging import logged_command
 
-VERSION = "1.1.1"
+VERSION = "1.1.2"
 
 @logged_command
 def cmd_start(update, context):
