@@ -127,6 +127,7 @@ class HiscoreResult(object):
 		[ # Minigames
 			'Last Man Standing (LMS)',
 			'Soul Wars Zeal',
+			'Guardians of the Rift (GOTR)',
 		] + \
 		boss_labels
 
