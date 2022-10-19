@@ -105,6 +105,8 @@ class HiscoreResult(object):
 		'Theatre of Blood',
 		'Theatre of Blood (Hard Mode)',
 		'Thermonuclear Smoke Devil',
+		'Tombs of Amascut',
+		'Tombs of Amascut (Expert Mode)',
 		'TzKal-Zuk',
 		'TzTok-Jad',
 		'Venenatis',
@@ -126,6 +128,7 @@ class HiscoreResult(object):
 		clue_labels + \
 		[ # Minigames
 			'Last Man Standing (LMS)',
+			'PvP Arena',
 			'Soul Wars Zeal',
 			'Guardians of the Rift (GOTR)',
 		] + \
@@ -163,7 +166,7 @@ class HiscoreResult(object):
 				skill_entry.rank = values[0]
 				skill_entry.level = values[1]
 				skill_entry.xp = values[2]
-			elif line_no < 83:
+			elif line_no < 88:
 				# lines[24] to lines[83] are generic scores
 				idx = line_no - 24
 				score_entry = self.score_entries[idx]
