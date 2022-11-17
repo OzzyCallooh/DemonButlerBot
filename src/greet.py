@@ -105,9 +105,9 @@ def cmd_greeting(update, context):
 		update.message.reply_text('As you wish. I will greet new members of this ' + \
 			'group with the following message:\n"{}"'.format(greeting))
 
-def setup_dispatcher(dispatcher):
-	dispatcher.add_handler(CommandHandler('greeting', cmd_greeting))
-	dispatcher.add_handler(MessageHandler(
+def setup_application(application):
+	application.add_handler(CommandHandler('greeting', cmd_greeting))
+	application.add_handler(MessageHandler(
 		callback=handle_new_chat_member,
 		filters=Filters.status_update.new_chat_members
 	))

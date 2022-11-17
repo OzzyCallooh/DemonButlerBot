@@ -94,6 +94,6 @@ def cmd_forget(update, context):
 		update.message.reply_text('I am not remembering any Old School RuneScape account username (RSN) for you.')
 	session.close()
 
-def setup_dispatcher(dispatcher):
-	dispatcher.add_handler(CommandHandler('remember', cmd_remember, pass_args=True))
-	dispatcher.add_handler(CommandHandler('forget', cmd_forget))
+def setup_application(application):
+	application.add_handler(CommandHandler('remember', cmd_remember, pass_args=True))
+	application.add_handler(CommandHandler('forget', cmd_forget))

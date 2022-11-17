@@ -2,7 +2,7 @@ import sys
 import re
 import logging
 import telegram
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Application, CommandHandler
 
 from config import config, require_permission
 import osrs
@@ -331,17 +331,17 @@ def main(argv):
 	database.init()
 
 	# Updater
-	logging.debug('Initializing updater')
-	updater = Updater(token=config['telegram']['token'])
-	updater.dispatcher.add_handler(CommandHandler('start', cmd_start))
-	updater.dispatcher.add_handler(CommandHandler('help', cmd_help))
-	updater.dispatcher.add_handler(CommandHandler('version', cmd_version))
-	updater.dispatcher.add_handler(CommandHandler('kchelp', cmd_kchelp))
-	updater.dispatcher.add_handler(CommandHandler('config', cmd_config))
-	updater.dispatcher.add_handler(CommandHandler('skills', cmd_skills, pass_args=True))
-	updater.dispatcher.add_handler(CommandHandler('stats', cmd_skills, pass_args=True))
-	updater.dispatcher.add_handler(CommandHandler('kc', make_hiscore_cmd(None), pass_args=True))
-	updater.dispatcher.add_handler(CommandHandler('clues', make_hiscore_cmd(
+	logging.debug('Initializing application')
+	application = Application.builder().token(config['telegram']['token']).build()
+	application.add_handler(CommandHandler('start', cmd_start))
+	application.add_handler(CommandHandler('help', cmd_help))
+	application.add_handler(CommandHandler('version', cmd_version))
+	application.add_handler(CommandHandler('kchelp', cmd_kchelp))
+	application.add_handler(CommandHandler('config', cmd_config))
+	application.add_handler(CommandHandler('skills', cmd_skills, pass_args=True))
+	application.add_handler(CommandHandler('stats', cmd_skills, pass_args=True))
+	application.add_handler(CommandHandler('kc', make_hiscore_cmd(None), pass_args=True))
+	application.add_handler(CommandHandler('clues', make_hiscore_cmd(
 		[
 			('Clue Scrolls (beginner)','Beginner'),
 			('Clue Scrolls (easy)','Easy'),
@@ -352,36 +352,36 @@ def main(argv):
 			('Clue Scrolls (all)', 'Total')
 		]), pass_args=True)
 	)
-	updater.dispatcher.add_handler(CommandHandler('gwd', make_hiscore_cmd(['General Graardor', 'Kree\'Arra', 'Commander Zilyana', 'K\'ril Tsutsaroth']), pass_args=True))
-	updater.dispatcher.add_handler(CommandHandler('dks', make_hiscore_cmd(
+	application.add_handler(CommandHandler('gwd', make_hiscore_cmd(['General Graardor', 'Kree\'Arra', 'Commander Zilyana', 'K\'ril Tsutsaroth']), pass_args=True))
+	application.add_handler(CommandHandler('dks', make_hiscore_cmd(
 		[
 			('Dagannoth Prime', 'Prime'),
 			('Dagannoth Rex', 'Rex'),
 			('Dagannoth Supreme', 'Supreme')
 		]), pass_args=True)
 	)
-	updater.dispatcher.add_handler(CommandHandler('raids', make_hiscore_cmd(
+	application.add_handler(CommandHandler('raids', make_hiscore_cmd(
 		[
 			'Chambers of Xeric', 'Chambers of Xeric (Challenge Mode)',
 			'Theatre of Blood', 'Theatre of Blood (Hard Mode)'
 		]), pass_args=True))
-	updater.dispatcher.add_handler(CommandHandler('slayer', make_hiscore_cmd(['Grotesque Guardians', 'Cerberus', 'Kraken', 'Alchemical Hydra']), pass_args=True))
-	updater.dispatcher.add_handler(CommandHandler('wildy', make_hiscore_cmd(['Crazy Archaeologist', 'Chaos Fanatic', 'Chaos Elemental', 'Scorpia', 'Venenatis', 'Vet\'ion', 'Callisto']), pass_args=True))
-	updater.dispatcher.add_handler(CommandHandler('f2p', make_hiscore_cmd(['Obor', 'Bryophyta']), pass_args=True))
-	updater.dispatcher.add_handler(CommandHandler('lms', make_hiscore_cmd(['Last Man Standing (LMS)']), pass_args=True))
-	updater.dispatcher.add_handler(CommandHandler('ge', cmd_ge, pass_args=True))
-	updater.dispatcher.add_error_handler(handle_error)
+	application.add_handler(CommandHandler('slayer', make_hiscore_cmd(['Grotesque Guardians', 'Cerberus', 'Kraken', 'Alchemical Hydra']), pass_args=True))
+	application.add_handler(CommandHandler('wildy', make_hiscore_cmd(['Crazy Archaeologist', 'Chaos Fanatic', 'Chaos Elemental', 'Scorpia', 'Venenatis', 'Vet\'ion', 'Callisto']), pass_args=True))
+	application.add_handler(CommandHandler('f2p', make_hiscore_cmd(['Obor', 'Bryophyta']), pass_args=True))
+	application.add_handler(CommandHandler('lms', make_hiscore_cmd(['Last Man Standing (LMS)']), pass_args=True))
+	application.add_handler(CommandHandler('ge', cmd_ge, pass_args=True))
+	application.add_error_handler(handle_error)
 
 	# Greeting
-	greet.setup_dispatcher(updater.dispatcher)
+	greet.setup_application(application)
 
 	# Remember account
-	rememberaccount.setup_dispatcher(updater.dispatcher)
+	rememberaccount.setup_application(application)
 
 	# Let's get started
 	if config['telegram']['use_webhook']:
 		logging.debug('Using webhook')
-		updater.start_webhook(
+		application.start_webhook(
 			listen='127.0.0.1',
 			port=config['telegram']['webhook']['internal_port'],
 			url_path=config['telegram']['token'],
@@ -393,8 +393,8 @@ def main(argv):
 		)
 	else:
 		logging.debug('Start polling')
-		updater.start_polling()
-	updater.idle()
+		application.start_polling()
+	application.idle()
 
 	logging.debug('Bot exiting')
 
