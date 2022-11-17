@@ -3,6 +3,7 @@ import re
 import logging
 import telegram
 from telegram.ext import Application, CommandHandler
+from telegram.constants import ChatAction
 
 from config import config, require_permission
 import osrs
@@ -77,7 +78,7 @@ stat_format = '''[{name}]({url}):
 {RUN:>2}   RC  {SLA:>2} SLAY  {FAR:>2} FARM
 {CON:>2} CONS  {HUN:>2} HUNT     {OVE:>4}```'''
 @logged_command
-@util.send_action(telegram.ChatAction.TYPING)
+@util.send_action(ChatAction.TYPING)
 def cmd_skills(update, context):
 	args = context.args
 
@@ -123,7 +124,7 @@ def make_hiscore_cmd(labels):
 
 	kc_format = '''[{name}]({url}):'''
 	@logged_command
-	@util.send_action(telegram.ChatAction.TYPING)
+	@util.send_action(ChatAction.TYPING)
 	def cmd_kc(update, context):
 		player = None
 		label_input = 'all'
@@ -250,7 +251,7 @@ def make_hiscore_cmd(labels):
 	return cmd_kc
 
 @logged_command
-@util.send_action(telegram.ChatAction.TYPING)
+@util.send_action(ChatAction.TYPING)
 def cmd_ge(update, context):
 	args = context.args
 	if len(args) == 0:
