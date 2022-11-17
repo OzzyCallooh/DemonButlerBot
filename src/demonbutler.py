@@ -339,9 +339,9 @@ def main(argv):
 	application.add_handler(CommandHandler('version', cmd_version))
 	application.add_handler(CommandHandler('kchelp', cmd_kchelp))
 	application.add_handler(CommandHandler('config', cmd_config))
-	application.add_handler(CommandHandler('skills', cmd_skills, pass_args=True))
-	application.add_handler(CommandHandler('stats', cmd_skills, pass_args=True))
-	application.add_handler(CommandHandler('kc', make_hiscore_cmd(None), pass_args=True))
+	application.add_handler(CommandHandler('skills', cmd_skills))
+	application.add_handler(CommandHandler('stats', cmd_skills))
+	application.add_handler(CommandHandler('kc', make_hiscore_cmd(None)))
 	application.add_handler(CommandHandler('clues', make_hiscore_cmd(
 		[
 			('Clue Scrolls (beginner)','Beginner'),
@@ -351,26 +351,26 @@ def main(argv):
 			('Clue Scrolls (elite)','Elite'),
 			('Clue Scrolls (master)','Master'),
 			('Clue Scrolls (all)', 'Total')
-		]), pass_args=True)
+		]))
 	)
-	application.add_handler(CommandHandler('gwd', make_hiscore_cmd(['General Graardor', 'Kree\'Arra', 'Commander Zilyana', 'K\'ril Tsutsaroth']), pass_args=True))
+	application.add_handler(CommandHandler('gwd', make_hiscore_cmd(['General Graardor', 'Kree\'Arra', 'Commander Zilyana', 'K\'ril Tsutsaroth'])))
 	application.add_handler(CommandHandler('dks', make_hiscore_cmd(
 		[
 			('Dagannoth Prime', 'Prime'),
 			('Dagannoth Rex', 'Rex'),
 			('Dagannoth Supreme', 'Supreme')
-		]), pass_args=True)
+		]))
 	)
 	application.add_handler(CommandHandler('raids', make_hiscore_cmd(
 		[
 			'Chambers of Xeric', 'Chambers of Xeric (Challenge Mode)',
 			'Theatre of Blood', 'Theatre of Blood (Hard Mode)'
-		]), pass_args=True))
-	application.add_handler(CommandHandler('slayer', make_hiscore_cmd(['Grotesque Guardians', 'Cerberus', 'Kraken', 'Alchemical Hydra']), pass_args=True))
-	application.add_handler(CommandHandler('wildy', make_hiscore_cmd(['Crazy Archaeologist', 'Chaos Fanatic', 'Chaos Elemental', 'Scorpia', 'Venenatis', 'Vet\'ion', 'Callisto']), pass_args=True))
-	application.add_handler(CommandHandler('f2p', make_hiscore_cmd(['Obor', 'Bryophyta']), pass_args=True))
-	application.add_handler(CommandHandler('lms', make_hiscore_cmd(['Last Man Standing (LMS)']), pass_args=True))
-	application.add_handler(CommandHandler('ge', cmd_ge, pass_args=True))
+		])))
+	application.add_handler(CommandHandler('slayer', make_hiscore_cmd(['Grotesque Guardians', 'Cerberus', 'Kraken', 'Alchemical Hydra'])))
+	application.add_handler(CommandHandler('wildy', make_hiscore_cmd(['Crazy Archaeologist', 'Chaos Fanatic', 'Chaos Elemental', 'Scorpia', 'Venenatis', 'Vet\'ion', 'Callisto'])))
+	application.add_handler(CommandHandler('f2p', make_hiscore_cmd(['Obor', 'Bryophyta'])))
+	application.add_handler(CommandHandler('lms', make_hiscore_cmd(['Last Man Standing (LMS)'])))
+	application.add_handler(CommandHandler('ge', cmd_ge))
 	application.add_error_handler(handle_error)
 
 	# Greeting

@@ -95,5 +95,5 @@ def cmd_forget(update, context):
 	session.close()
 
 def setup_application(application):
-	application.add_handler(CommandHandler('remember', cmd_remember, pass_args=True))
+	application.add_handler(CommandHandler('remember', cmd_remember))
 	application.add_handler(CommandHandler('forget', cmd_forget))
