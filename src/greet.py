@@ -1,7 +1,7 @@
 import logging
 
 from telegram.ext import CommandHandler, MessageHandler
-from telegram.ext.filters import Filters
+from telegram.ext.filters import StatusUpdate
 from sqlalchemy import Column, DateTime, String, BigInteger
 from config import require_group_admin
 
@@ -109,5 +109,5 @@ def setup_application(application):
 	application.add_handler(CommandHandler('greeting', cmd_greeting))
 	application.add_handler(MessageHandler(
 		callback=handle_new_chat_member,
-		filters=Filters.status_update.new_chat_members
+		filters=StatusUpdate.NEW_CHAT_MEMBERS
 	))
