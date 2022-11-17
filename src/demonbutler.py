@@ -393,8 +393,8 @@ def main(argv):
 			drop_pending_updates=True
 		)
 	else:
-		logging.debug('Start polling')
-		application.start_polling()
+		logging.debug('Run polling')
+		application.run_polling()
 	application.idle()
 
 	logging.debug('Bot exiting')
