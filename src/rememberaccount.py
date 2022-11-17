@@ -33,7 +33,7 @@ invalid_rsn_chars = re.compile('[^\w _]')
 def is_valid_rsn(rs_username):
 	return re.search(invalid_rsn_chars, rs_username) == None
 
-def cmd_remember(update, context):
+async def cmd_remember(update, context):
 	args = context.args
 	rs_username = (' '.join(args))[:30]
 	tg_user_id = update.message.from_user.id
@@ -42,7 +42,7 @@ def cmd_remember(update, context):
 	if rs_username != '':
 		# Set remembered username
 		if not is_valid_rsn(rs_username):
-			update.message.reply_text('That doesn\'t look like a valid RSN.')
+			await update.message.reply_text('That doesn\'t look like a valid RSN.')
 			session.close()
 			return
 
@@ -53,7 +53,7 @@ def cmd_remember(update, context):
 			ra.rs_username = rs_username
 		session.add(ra)
 		session.commit()
-		update.message.reply_text(
+		await update.message.reply_text(
 			'OK, I will remember your Old School RuneScape username (RSN): ' + \
 			'*{}*\n\n'.format(
 				rs_username
@@ -67,7 +67,7 @@ def cmd_remember(update, context):
 	else:
 		rs_username = get_rs_username(tg_user_id)
 		if rs_username:
-			update.message.reply_text(
+			await update.message.reply_text(
 				'I am remembering this Old School RuneScape account username (RSN) for you: ' + \
 				'*{}*\n\n'.format(
 					rs_username
@@ -76,12 +76,12 @@ def cmd_remember(update, context):
 				parse_mode='Markdown'
 			)
 		else:
-			update.message.reply_text(
+			await update.message.reply_text(
 				'Put your Old School RuneScape account username (RSN) after the command and I\'ll remember it.'
 			)
 	session.close()
 
-def cmd_forget(update, context):
+async def cmd_forget(update, context):
 	tg_user_id = update.message.from_user.id
 	session = database.dbsession()
 	ra = get_remembered_account(tg_user_id, session=session)
@@ -89,9 +89,9 @@ def cmd_forget(update, context):
 	if ra:
 		session.delete(ra)
 		session.commit()
-		update.message.reply_text('OK, I forgot your Old School RuneScape account username (RSN). Set it again using /remember')
+		await update.message.reply_text('OK, I forgot your Old School RuneScape account username (RSN). Set it again using /remember')
 	else:
-		update.message.reply_text('I am not remembering any Old School RuneScape account username (RSN) for you.')
+		await update.message.reply_text('I am not remembering any Old School RuneScape account username (RSN) for you.')
 	session.close()
 
 def setup_application(application):

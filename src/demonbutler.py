@@ -16,19 +16,19 @@ from cmdlogging import logged_command
 VERSION = "1.1.2"
 
 @logged_command
-def cmd_start(update, context):
-	update.message.reply_text('Greetings, mortal. Type /help to see a list of commands I can recognize.',
+async def cmd_start(update, context):
+	await update.message.reply_text('Greetings, mortal. Type /help to see a list of commands I can recognize.',
 		parse_mode='Markdown',
 		disable_web_page_preview=True
 	)
 
 @logged_command
-def cmd_version(update, context):
-	update.message.reply_text('I am DemonButlerBot, version ' + VERSION)
+async def cmd_version(update, context):
+	await update.message.reply_text('I am DemonButlerBot, version ' + VERSION)
 
 @logged_command
-def cmd_help(update, context):
-	update.message.reply_text('I can serve you in the following ways:\n' + \
+async def cmd_help(update, context):
+	await update.message.reply_text('I can serve you in the following ways:\n' + \
 		'/remember <name> - Tell me your RSN\n' + \
 		'/skills <name> - Lookup player levels\n' + \
 		'/kchelp - Explains /kc, which looks up boss kc\n' + \
@@ -41,8 +41,8 @@ def cmd_help(update, context):
 	)
 
 @logged_command
-def cmd_kchelp(update, context):
-	update.message.reply_text(
+async def cmd_kchelp(update, context):
+	await update.message.reply_text(
 		'`/kc <name>`\n' + \
 		'`/kc <name>, <label>`\n' + \
 		'`/kc <label>` (if you used /remember)\n' + \
@@ -64,8 +64,8 @@ def cmd_kchelp(update, context):
 
 @logged_command
 @require_permission('operator')
-def cmd_config(update, context):
-	update.message.reply_text('Nothing interesting happens.')
+async def cmd_config(update, context):
+	await update.message.reply_text('Nothing interesting happens.')
 
 stat_format = '''[{name}]({url}):
 ```
@@ -79,14 +79,14 @@ stat_format = '''[{name}]({url}):
 {CON:>2} CONS  {HUN:>2} HUNT     {OVE:>4}```'''
 @logged_command
 @util.send_action(ChatAction.TYPING)
-def cmd_skills(update, context):
+async def cmd_skills(update, context):
 	args = context.args
 
 	player = ' '.join(args)
 	if len(args) == 0:
 		player = rememberaccount.get_rs_username(update.message.from_user.id)
 		if player == None:
-			update.message.reply_text('Please use /skills followed by the name of ' + \
+			await update.message.reply_text('Please use /skills followed by the name of ' + \
 				'the player you wish to look up.')
 			return
 
@@ -102,13 +102,13 @@ def cmd_skills(update, context):
 				kwargs[label[:3].upper()] = hiscore.skills[label].level
 			else:
 				kwargs[label[:3].upper()] = ' -'
-		update.message.reply_text(
+		await update.message.reply_text(
 			stat_format.format(**kwargs),
 			parse_mode='Markdown',
 			disable_web_page_preview=True
 		)
 	else:
-		update.message.reply_text('Unfortunately, mortal, there is no such being ' + \
+		await update.message.reply_text('Unfortunately, mortal, there is no such being ' + \
 			'who goes by the name "{player}".'.format(
 			player=player
 		))
@@ -125,7 +125,7 @@ def make_hiscore_cmd(labels):
 	kc_format = '''[{name}]({url}):'''
 	@logged_command
 	@util.send_action(ChatAction.TYPING)
-	def cmd_kc(update, context):
+	async def cmd_kc(update, context):
 		player = None
 		label_input = 'all'
 		implicit_all = False
@@ -171,7 +171,7 @@ def make_hiscore_cmd(labels):
 			implicit_all = True
 
 			if not player:
-				update.message.reply_text(
+				await update.message.reply_text(
 					'Put an Old School RuneScape account username (RSN) after the command.' + \
 					' You can also tell me to /remember a specific RSN.' + \
 					(' If you want a specific hiscore label too, put a comma and then the label.' if not assume_player_query else '') + \
@@ -196,7 +196,7 @@ def make_hiscore_cmd(labels):
 						break
 
 		if len(labels_lookup) == 0:
-			update.message.reply_text(
+			await update.message.reply_text(
 				'I\'m not sure which hiscore labels you want.\n\n' + \
 				'If you want to search for an RSN, put a comma at the end of your message.'
 			)
@@ -224,7 +224,7 @@ def make_hiscore_cmd(labels):
 						score=score
 					))
 				if count > 9 and update.message.chat.type != 'private' and implicit_all:
-					update.message.reply_text(
+					await update.message.reply_text(
 						'I understood your request, but the result contained many hiscore labels. ' + \
 						'Since this isn\'t a private chat, please use "all" for your label query to explicitly allow this.'
 					)
@@ -232,19 +232,19 @@ def make_hiscore_cmd(labels):
 
 			if count > 0:
 				message = ('\n' if len(lines) > 2 else ' ').join(lines)
-				update.message.reply_text(
+				await update.message.reply_text(
 					message,
 					parse_mode='Markdown',
 					disable_web_page_preview=True
 				)
 			else:
-				update.message.reply_text(
+				await update.message.reply_text(
 					'That account is not ranked on the hiscores for that.',
 					parse_mode='Markdown',
 					disable_web_page_preview=True
 				)
 		else:
-			update.message.reply_text('Unfortunately, mortal, there is no such being ' + \
+			await update.message.reply_text('Unfortunately, mortal, there is no such being ' + \
 				'who goes by the name "{player}".'.format(
 				player=player
 			))
@@ -252,7 +252,7 @@ def make_hiscore_cmd(labels):
 
 @logged_command
 @util.send_action(ChatAction.TYPING)
-def cmd_ge(update, context):
+async def cmd_ge(update, context):
 	args = context.args
 	if len(args) == 0:
 		update.message.reply_text('Please use /ge followed by the name of ' + \
@@ -290,7 +290,7 @@ def cmd_ge(update, context):
 			priceGraphs = osrs.ge.get_price_graphs(itemEntry.id)
 			if priceGraphs:
 
-				update.message.reply_text(
+				await update.message.reply_text(
 					'Current price of [{name}]({url}): {price} gp'.format(
 						name=itemEntry.name,
 						price=util.shorten_number(priceGraphs.daily.latest.price),
@@ -299,7 +299,7 @@ def cmd_ge(update, context):
 					parse_mode='Markdown'
 				)
 			else:
-				update.message.reply_text(
+				await update.message.reply_text(
 					'Unfortunately, mortal, the Grand Exchange ' + \
 						'failed to load the price graphs for [{name}]({url}).'.format(
 						name=itemSearchTerm,
@@ -308,18 +308,18 @@ def cmd_ge(update, context):
 					parse_mode='Markdown'
 				)
 		else:
-			update.message.reply_text('Unfortunately, mortal, there is no such item ' + \
+			await update.message.reply_text('Unfortunately, mortal, there is no such item ' + \
 				'traded on the Grand Exchange with the name "{name}".'.format(
 				name=itemSearchTerm
 			))
 	else:
-		update.message.reply_text('Unfortunately, mortal, I could not access the ' + \
+		await update.message.reply_text('Unfortunately, mortal, I could not access the ' + \
 			'Grand Exchange prices for that item at this time.')
 
-def handle_error(update, context):
+async def handle_error(update, context):
 	error = context.error
 	logging.error(str(error))
-	update.message.reply_text('I\'m sorry, there seems to be a magical force ' + \
+	await update.message.reply_text('I\'m sorry, there seems to be a magical force ' + \
 		'preventing me from doing my job. I have alerted my master.')
 	raise error
 
@@ -395,7 +395,6 @@ def main(argv):
 	else:
 		logging.debug('Run polling')
 		application.run_polling()
-	application.idle()
 
 	logging.debug('Bot exiting')
 
