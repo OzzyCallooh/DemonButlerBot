@@ -1,7 +1,6 @@
 import sys
 import json
 from functools import wraps
-from mwt import MWT
 
 config = None
 
@@ -12,18 +11,19 @@ if len(sys.argv) < 2:
 with open(sys.argv[1]) as f:
 	config = json.loads(f.read())
 
-@MWT(timeout=60*10)
-def get_admin_ids(bot, chat_id):
-	return [admin.user.id for admin in bot.get_chat_administrators(chat_id)]
+async def get_admin_ids(bot, chat_id):
+	admins = await bot.get_chat_administrators(chat_id)
+	return [admin.user.id for admin in admins]
 
 def require_group_admin(func):
 	@wraps(wraps)
-	def wrapped(update, context, *args, **kwargs):
+	async def wrapped(update, context, *args, **kwargs):
 		user_id = update.effective_user.id
 		chat_id = update.effective_chat.id
 
-		if user_id in get_admin_ids(context.bot, chat_id):
-			return func(update, context, *args, **kwargs)
+		admins = await get_admin_ids(context.bot, chat_id)
+		if user_id in admins:
+			return await func(update, context, *args, **kwargs)
 		else:
 			update.message.reply_text('I\'m sorry mortal, but I cannot honor that request.')
 			return
@@ -46,11 +46,11 @@ def user_has_permission(user, permission):
 def require_permission(permission):
 	def deco(func):
 		@wraps(wraps)
-		def wrapped(update, context, *args, **kwargs):
+		async def wrapped(update, context, *args, **kwargs):
 			if user_has_permission(update.effective_user, permission):
-				return func(update, context, *args, **kwargs)
+				return await func(update, context, *args, **kwargs)
 			else:
-				update.message.reply_text(config['permission_denied'])
+				await update.message.reply_text(config['permission_denied'])
 				return
 
 		return wrapped

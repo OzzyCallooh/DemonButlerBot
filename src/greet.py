@@ -1,7 +1,7 @@
 import logging
 
 from telegram.ext import CommandHandler, MessageHandler
-from telegram.ext.filters import Filters
+from telegram.ext.filters import StatusUpdate
 from sqlalchemy import Column, DateTime, String, BigInteger
 from config import require_group_admin
 
@@ -28,13 +28,13 @@ def get_greeting(chat_id):
 	).one_or_none()
 	return greetcfg.greeting if greetcfg else None
 
-def im_in_a_new_chat(update, context):
+async def im_in_a_new_chat(update, context):
 	logging.info('Bot was added to chat: ' + str(update.effective_message.chat_id))
-	update.message.reply_text('Hello, I am Alathazdrar the demon butler. ' + \
+	await update.message.reply_text('Hello, I am Alathazdrar the demon butler. ' + \
 		' Thank you for hiring me for this group chat. I am at your service. ' + \
 		' Type /help to see what I can do.')
 
-def handle_new_chat_member(update, context):
+async def handle_new_chat_member(update, context):
 	if len(update.message.new_chat_members) <= 0:
 		return
 
@@ -42,7 +42,7 @@ def handle_new_chat_member(update, context):
 	has_non_bot = False
 	for user in update.message.new_chat_members:
 		if user.is_bot and user.id == context.bot.id:
-			im_in_a_new_chat(update, context)
+			await im_in_a_new_chat(update, context)
 		if not user.is_bot:
 			has_non_bot = True
 			break
@@ -52,14 +52,14 @@ def handle_new_chat_member(update, context):
 	greeting = get_greeting(update.message.chat_id)
 	if greeting:
 		#print('Sending greeting')
-		update.message.reply_text(greeting)
+		await update.message.reply_text(greeting)
 	else:
 		#print('Chat does not have greeting set')
 		pass
 
 @logged_command
 @require_group_admin
-def cmd_greeting(update, context):
+async def cmd_greeting(update, context):
 	session = database.dbsession()
 
 	# Query db for greeting
@@ -77,7 +77,7 @@ def cmd_greeting(update, context):
 			reply += ' \nDisable this greeting with /greeting delete.'
 		else:
 			reply += ' This group does not have a greeting set.'
-		update.message.reply_text(reply)
+		await update.message.reply_text(reply)
 		return
 	greeting = update.message.text[idx+1:]
 
@@ -86,13 +86,13 @@ def cmd_greeting(update, context):
 		if greetcfg:
 			session.delete(greetcfg)
 			session.commit()
-			update.message.reply_text('As you wish. I will no longer greet new ' + \
+			await update.message.reply_text('As you wish. I will no longer greet new ' + \
 				'members of this group.')
 		else:
-			update.message.reply_text('I am not presently instructed to greet ' + \
+			await update.message.reply_text('I am not presently instructed to greet ' + \
 				'new members of this group.')
 	elif len(greeting) > GREETING_LENGTH_LIMIT:
-		update.message.reply_text('The length of this greeting is too great for ' + \
+		await update.message.reply_text('The length of this greeting is too great for ' + \
 			'me to remember. I can only remember greetings that are {} characters or less; '.format(GREETING_LENGTH_LIMIT) + \
 			'the one you provided is {} characters. Try using a link to a website like pastebin.org.'.format(len(greeting)))
 	else:
@@ -102,12 +102,12 @@ def cmd_greeting(update, context):
 		greetcfg.set_by = update.message.from_user.id
 		session.add(greetcfg)
 		session.commit()
-		update.message.reply_text('As you wish. I will greet new members of this ' + \
+		await update.message.reply_text('As you wish. I will greet new members of this ' + \
 			'group with the following message:\n"{}"'.format(greeting))
 
-def setup_dispatcher(dispatcher):
-	dispatcher.add_handler(CommandHandler('greeting', cmd_greeting))
-	dispatcher.add_handler(MessageHandler(
+def setup_application(application):
+	application.add_handler(CommandHandler('greeting', cmd_greeting))
+	application.add_handler(MessageHandler(
 		callback=handle_new_chat_member,
-		filters=Filters.status_update.new_chat_members
+		filters=StatusUpdate.NEW_CHAT_MEMBERS
 	))
