@@ -96,6 +96,7 @@ class HiscoreResult(object):
 		'Nightmare',
 		'Phosani\'s Nightmare',
 		'Obor',
+		'Phantom Muspah',
 		'Sarachnis',
 		'Scorpia',
 		'Skotizo',
@@ -166,7 +167,7 @@ class HiscoreResult(object):
 				skill_entry.rank = values[0]
 				skill_entry.level = values[1]
 				skill_entry.xp = values[2]
-			elif line_no < 88:
+			elif line_no < 89:
 				# lines[24] to lines[83] are generic scores
 				idx = line_no - 24
 				score_entry = self.score_entries[idx]
