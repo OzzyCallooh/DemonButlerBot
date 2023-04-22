@@ -7,6 +7,7 @@ from telegram.constants import ChatAction
 
 from config import config, require_permission
 import osrs
+from osrs.accounttype import AccountType, str_to_account_type, readable_account_type
 import database
 import greet
 import rememberaccount
@@ -45,6 +46,7 @@ async def cmd_kchelp(update, context):
 	await update.message.reply_text(
 		'`/kc <name>`\n' + \
 		'`/kc <name>, <label>`\n' + \
+		'`/kc <name>, <label>, <accounttype>`\n' + \
 		'`/kc <label>` (if you used /remember)\n' + \
 		'\n' + \
 		'Looks up a name on the hiscores and queries one or more kill-count labels.' + \
@@ -122,11 +124,13 @@ def make_hiscore_cmd(labels):
 		labels = osrs.hiscores.HiscoreResult.score_labels
 		assume_player_query = False
 
-	kc_format = '''[{name}]({url}):'''
+	# e.g. Iron Yeen (Ironman) - URL linked to Ironman Hiscores
+	kc_format = '''[{name} ({account_type})]({url}):'''
 	@logged_command
 	@util.send_action(ChatAction.TYPING)
 	async def cmd_kc(update, context):
 		player = None
+		account_type = AccountType.REGULAR
 		label_input = 'all'
 		implicit_all = False
 
@@ -137,37 +141,46 @@ def make_hiscore_cmd(labels):
 
 			if ',' in arg_str:
 				# /kc Iron Yeen, Kree'Arra
-				player, label_input = arg_str.split(',')
+				args = arg_str.split(',')
+				player, label_input = args[:2]
 				player = player.strip()
 				label_input = label_input.strip().lower()
+				if len(args) > 2:
+					# /kc Iron Yeen, Kree'Arra, Iron
+					account_type_name = args[2]
+					account_type = str_to_account_type(account_type_name)
+					if account_type == AccountType.ERROR:
+						await update.message.reply_text(
+							'I don\'t know this account type: {}'.format(account_type_name)
+						)
+						return
 				if label_input == '':
 					label_input = 'all'
 					implicit_all = True
 			elif arg_str.strip().lower() == 'help':
 				cmd_kchelp(update, context)
 				return
+			elif assume_player_query:
+				# /lms Salty Hyena
+				player = arg_str.strip()
+				label_input = 'all'
+				implicit_all = True
 			else:
-				if assume_player_query:
-					# /lms Salty Hyena
+				player, account_type = rememberaccount.get_rs_username_and_type(update.message.from_user.id)
+				if player:
+					# /kc Kree'Arra
+					label_input = arg_str.strip().lower()
+					if label_input == '':
+						label_input = 'all'
+						implicit_all = True
+				else:
+					# /kc MyFriendsRSN
 					player = arg_str.strip()
 					label_input = 'all'
 					implicit_all = True
-				else:
-					player = rememberaccount.get_rs_username(update.message.from_user.id)
-					if player:
-						# /kc Kree'Arra
-						label_input = arg_str.strip().lower()
-						if label_input == '':
-							label_input = 'all'
-							implicit_all = True
-					else:
-						# /kc MyFriendsRSN
-						player = arg_str.strip()
-						label_input = 'all'
-						implicit_all = True
 		else:
 			# /kc
-			player = rememberaccount.get_rs_username(update.message.from_user.id)
+			player, account_type = rememberaccount.get_rs_username_and_type(update.message.from_user.id)
 			implicit_all = True
 
 			if not player:
@@ -179,9 +192,10 @@ def make_hiscore_cmd(labels):
 				)
 				return
 
-		logging.debug('player: {player}, label_input: {label_input}'.format(
+		logging.debug('player: {player}, label_input: {label_input}, account_type: {account_type}'.format(
 			player=player,
-			label_input=label_input
+			label_input=label_input,
+			account_type=account_type
 		))
 
 		labels_lookup = None
@@ -202,12 +216,13 @@ def make_hiscore_cmd(labels):
 			)
 			return
 
-		hiscore = osrs.hiscores.HiscoreResult.lookup(player)
+		hiscore = osrs.hiscores.HiscoreResult.lookup(player, account_type)
 		if hiscore:
 			lines = []
 			lines.append(kc_format.format(
 				name=player,
-				url=osrs.hiscores.HiscoreResult.get_full_url(player)
+				url=osrs.hiscores.HiscoreResult.get_full_url(player, account_type),
+				account_type=readable_account_type(account_type)
 			))
 			count = 0
 			for label in labels_lookup:
@@ -217,11 +232,14 @@ def make_hiscore_cmd(labels):
 					label = label[1]
 
 				score = hiscore.scores[score_label].score
+				rank = hiscore.scores[score_label].rank
 				if score >= 0:
 					count += 1
-					lines.append('{label}: *{score}*'.format(
+					lines.append('{label}: *{score}*  #{rank}'.format(
 						label=label,
-						score=score
+						score=score,
+						account_type=readable_account_type(account_type),
+						rank=rank
 					))
 				if count > 9 and update.message.chat.type != 'private' and implicit_all:
 					await update.message.reply_text(

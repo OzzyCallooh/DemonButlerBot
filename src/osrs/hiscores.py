@@ -3,6 +3,7 @@ from requests.models import PreparedRequest
 
 from mwt import MWT
 from util import shorten_number
+from osrs.accounttype import AccountType, readable_account_type
 
 def rank_str(rank):
 	if rank == -1:
@@ -44,10 +45,21 @@ class ScoreEntry(object):
 			)
 
 class HiscoreResult(object):
-	hiscore_full_url = 'https://secure.runescape.com/m=hiscore_oldschool/' + \
-		'hiscorepersonal.ws'
-	hiscore_url = 'https://secure.runescape.com/m=hiscore_oldschool/' + \
+	# The small changes needed for each account type for the URL.
+	category_name = {
+		AccountType.REGULAR: '',
+		AccountType.IRONMAN: '_ironman',
+		AccountType.HARDCORE_IRONMAN: '_hardcore_ironman',
+		AccountType.ULTIMATE_IRONMAN: '_ultimate',
+		AccountType.SKILLER: '_skiller',
+		AccountType.PURE: '_skiller_defence',
+	}
+	# URL to attach to messages for users to read.
+	hiscore_full_url = 'https://secure.runescape.com/m=hiscore_oldschoolCATEGORY/hiscorepersonal.ws'
+	# URL to fetch hiscore values to be parsed.
+	hiscore_url = 'https://secure.runescape.com/m=hiscore_oldschoolCATEGORY/' + \
 		'index_lite.ws'
+	# Skills (Updated 2023-04-22)
 	skill_labels = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints',
 	'Ranged', 'Prayer', 'Magic', 'Cooking', 'Woodcutting', 'Fletching',
 	'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore',
@@ -64,12 +76,15 @@ class HiscoreResult(object):
 		'Clue Scrolls (master)'
 	]
 
+	# Bosses (Updated 2023-04-22)
 	boss_labels = [
 		'Abyssal Sire',
 		'Alchemical Hydra',
+		'Artio',
 		'Barrows',
 		'Bryophyta',
 		'Callisto',
+		'Calvar\'ion',
 		'Cerberus',
 		'Chambers of Xeric',
 		'Chambers of Xeric (Challenge Mode)',
@@ -100,6 +115,7 @@ class HiscoreResult(object):
 		'Sarachnis',
 		'Scorpia',
 		'Skotizo',
+		'Spindel',
 		'Tempoross',
 		'Gauntlet',
 		'Corrupted Gauntlet',
@@ -160,15 +176,15 @@ class HiscoreResult(object):
 			# parse values on line as ints
 			#print('line {}: {}'.format(line_no, lines[line_no]))
 			values = [int(x) if x is not '' else 0 for x in lines[line_no].split(',')]
-			if line_no < 24:
-				# lines[0] to lines[23] are skills
+			if line_no < len(self.skill_entries):
+				# The first lines are all skills
 				idx = line_no
 				skill_entry = self.skill_entries[idx]
 				skill_entry.rank = values[0]
 				skill_entry.level = values[1]
 				skill_entry.xp = values[2]
-			elif line_no < 89:
-				# lines[24] to lines[83] are generic scores
+			elif line_no - len(self.skill_entries) < len(self.score_entries):
+				# Remaining lines are generic scores
 				idx = line_no - 24
 				score_entry = self.score_entries[idx]
 				score_entry.rank = values[0]
@@ -177,8 +193,9 @@ class HiscoreResult(object):
 
 	@staticmethod
 	@MWT(60*10)
-	def lookup(player='Zezima'):
-		res = requests.get(HiscoreResult.hiscore_url,
+	def lookup(player='Zezima', account_type: AccountType = AccountType.REGULAR):
+		categoried_url = HiscoreResult.hiscore_url.replace('CATEGORY', HiscoreResult.category_name[account_type])
+		res = requests.get(categoried_url,
 			params={ 'player': player },
 			timeout=5
 		)
@@ -187,9 +204,14 @@ class HiscoreResult(object):
 		else:
 			return None
 
-	def get_full_url(player):
+	def get_full_url(player: str, rs_account_type: AccountType = AccountType.REGULAR):
 		req = PreparedRequest()
-		req.prepare_url(HiscoreResult.hiscore_full_url, {'player': player})
+		categoried_url = HiscoreResult.hiscore_full_url.replace('CATEGORY', HiscoreResult.category_name[rs_account_type])
+		url_args = {
+			'player': player, # Regular hiscores
+			'user1': player,  # Other hiscores
+		}
+		req.prepare_url(categoried_url, url_args)
 		return req.url
 
 def main():
