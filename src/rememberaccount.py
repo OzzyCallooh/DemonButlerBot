@@ -41,7 +41,7 @@ def get_rs_username_and_type(tg_user_id, session=None) -> tuple[str, AccountType
 	if session == None:
 		session = database.dbsession()
 	ra = get_remembered_account(tg_user_id, session)
-	return ra.rs_username, ra.rs_account_type if ra else (None, None)
+	return (ra.rs_username, ra.rs_account_type) if ra else (None, None)
 
 invalid_rsn_chars = re.compile('[^\w _]')
 def is_valid_rsn(rs_username):
