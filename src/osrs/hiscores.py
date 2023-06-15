@@ -136,7 +136,9 @@ class HiscoreResult(object):
 
 	bh_labels = [
 		'Bounty Hunter (rogue)',
-		'Bounty Hunter (hunter)'
+		'Bounty Hunter (hunter)',
+		'Bounty Hunter (rogue, legacy)',
+		'Bounty Hunter (hunter, legacy)'
 	]
 
 	score_labels = \
