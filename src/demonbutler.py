@@ -14,7 +14,7 @@ import rememberaccount
 import util
 from cmdlogging import logged_command
 
-VERSION = "1.2.2"
+VERSION = "1.3.0"
 
 @logged_command
 async def cmd_start(update, context):
@@ -98,10 +98,10 @@ async def cmd_skills(update, context):
 			'name': player,
 			'url': osrs.hiscores.HiscoreResult.get_full_url(player)
 		}
-		for label in osrs.hiscores.HiscoreResult.skill_labels:
-			level = hiscore.skills[label].level
+		for label, skill_entry in hiscore.skills.items():
+			level = skill_entry.level
 			if level > 0:
-				kwargs[label[:3].upper()] = hiscore.skills[label].level
+				kwargs[label[:3].upper()] = skill_entry.level
 			else:
 				kwargs[label[:3].upper()] = ' -'
 		await update.message.reply_text(
@@ -121,7 +121,6 @@ non_alnum = re.compile('\W')
 def make_hiscore_cmd(labels):
 	assume_player_query = True
 	if labels == None:
-		labels = osrs.hiscores.HiscoreResult.score_labels
 		assume_player_query = False
 
 	# e.g. Iron Yeen (Ironman) - URL linked to Ironman Hiscores
@@ -198,24 +197,6 @@ def make_hiscore_cmd(labels):
 			account_type=account_type
 		))
 
-		labels_lookup = None
-		if label_input.lower() == 'all':
-			labels_lookup = labels
-		else:
-			labels_lookup = []
-			for label in labels:
-				if re.sub(non_alnum, '', label_input).lower() in re.sub(non_alnum, '', label).lower():
-					labels_lookup.append(label)
-					if len(labels_lookup) >= 4:
-						break
-
-		if len(labels_lookup) == 0:
-			await update.message.reply_text(
-				'I\'m not sure which hiscore labels you want.\n\n' + \
-				'If you want to search for an RSN, put a comma at the end of your message.'
-			)
-			return
-
 		hiscore = osrs.hiscores.HiscoreResult.lookup(player, account_type)
 		if hiscore:
 			lines = []
@@ -225,18 +206,16 @@ def make_hiscore_cmd(labels):
 				account_type=readable_account_type(account_type)
 			))
 			count = 0
-			for label in labels_lookup:
-				score_label = label
-				if type(label) == tuple:
-					score_label = label[0]
-					label = label[1]
+			for score_label, score_entry in hiscore.scores.items():
+				if label_input.lower() != 'all' and re.sub(non_alnum, '', label_input).lower() not in re.sub(non_alnum, '', score_entry.label).lower():
+					continue
 
-				score = hiscore.scores[score_label].score
-				rank = hiscore.scores[score_label].rank
+				score = score_entry.score
+				rank = score_entry.rank
 				if score >= 0:
 					count += 1
 					lines.append('{label}: *{score}*  #{rank}'.format(
-						label=label,
+						label=score_entry.label,
 						score=score,
 						account_type=readable_account_type(account_type),
 						rank=rank
