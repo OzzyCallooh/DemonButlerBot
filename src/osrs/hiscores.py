@@ -58,144 +58,32 @@ class HiscoreResult(object):
 	hiscore_full_url = 'https://secure.runescape.com/m=hiscore_oldschoolCATEGORY/hiscorepersonal.ws'
 	# URL to fetch hiscore values to be parsed.
 	hiscore_url = 'https://secure.runescape.com/m=hiscore_oldschoolCATEGORY/' + \
-		'index_lite.ws'
-	# Skills (Updated 2023-04-22)
-	skill_labels = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints',
-	'Ranged', 'Prayer', 'Magic', 'Cooking', 'Woodcutting', 'Fletching',
-	'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore',
-	'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecraft', 'Hunter',
-	'Construction']
+		'index_lite.json'
 
-	clue_labels = [
-		'Clue Scrolls (all)',
-		'Clue Scrolls (beginner)',
-		'Clue Scrolls (easy)',
-		'Clue Scrolls (medium)',
-		'Clue Scrolls (hard)',
-		'Clue Scrolls (elite)',
-		'Clue Scrolls (master)'
-	]
-
-	# Bosses (Updated 2023-04-22)
-	boss_labels = [
-		'Abyssal Sire',
-		'Alchemical Hydra',
-		'Artio',
-		'Barrows',
-		'Bryophyta',
-		'Callisto',
-		'Calvar\'ion',
-		'Cerberus',
-		'Chambers of Xeric',
-		'Chambers of Xeric (Challenge Mode)',
-		'Chaos Elemental',
-		'Chaos Fanatic',
-		'Commander Zilyana',
-		'Corporeal Beast',
-		'Crazy Archaeologist',
-		'Dagannoth Prime',
-		'Dagannoth Rex',
-		'Dagannoth Supreme',
-		'Deranged Archaeologist',
-		'Duke Sucellus',
-		'General Graardor',
-		'Giant Mole',
-		'Grotesque Guardians',
-		'Hespori',
-		'Kalphite Queen',
-		'King Black Dragon',
-		'Kraken',
-		'Kree\'Arra',
-		'K\'ril Tsutsaroth',
-		'Mimic',
-		'Nex',
-		'Nightmare',
-		'Phosani\'s Nightmare',
-		'Obor',
-		'Phantom Muspah',
-		'Sarachnis',
-		'Scorpia',
-		'Skotizo',
-		'Spindel',
-		'Tempoross',
-		'Gauntlet',
-		'Corrupted Gauntlet',
-		'Leviathan',
-		'Whisperer',
-		'Theatre of Blood',
-		'Theatre of Blood (Hard Mode)',
-		'Thermonuclear Smoke Devil',
-		'Tombs of Amascut',
-		'Tombs of Amascut (Expert Mode)',
-		'TzKal-Zuk',
-		'TzTok-Jad',
-		'Vardorvis',
-		'Venenatis',
-		'Vet\'ion',
-		'Vorkath',
-		'Wintertodt',
-		'Zalcano',
-		'Zulrah'
-	]
-
-	bh_labels = [
-		'Bounty Hunter (rogue)',
-		'Bounty Hunter (hunter)',
-		'Bounty Hunter (rogue, legacy)',
-		'Bounty Hunter (hunter, legacy)'
-	]
-
-	score_labels = \
-		[ 'League Points' ] + \
-		bh_labels + \
-		clue_labels + \
-		[ # Minigames
-			'Last Man Standing (LMS)',
-			'PvP Arena',
-			'Soul Wars Zeal',
-			'Guardians of the Rift (GOTR)',
-		] + \
-		boss_labels
-
-	
-
-	def __init__(self):
+	def __init__(self, payload):
 		self.skill_entries = []
 		self.skills = {}
-		for skill_label in HiscoreResult.skill_labels:
-			skill_entry = SkillEntry(skill_label, -1, -1, -1)
+
+		for skill_payload in payload['skills']:
+			skill_entry = SkillEntry(
+				skill_payload['name'],
+				skill_payload['rank'],
+				skill_payload['level'],
+				skill_payload['xp']
+			)
 			self.skill_entries.append(skill_entry)
-			self.skills[skill_label] = skill_entry
+			self.skills[skill_payload['name']] = skill_entry
 
 		self.score_entries = []
 		self.scores = {}
-		for score_label in HiscoreResult.score_labels:
-			score_entry = ScoreEntry(score_label, -1, -1)
+		for score_payload in payload['activities']:
+			score_entry = ScoreEntry(
+				score_payload['name'],
+				score_payload['rank'],
+				score_payload['score']
+			)
 			self.score_entries.append(score_entry)
-			self.scores[score_label] = score_entry
-
-	@staticmethod
-	def parse(csv):
-		self = HiscoreResult()
-		lines = csv.split('\n')
-		for line_no in range(0, len(lines)):
-			# parse values on line as ints
-			#print('line {}: {}'.format(line_no, lines[line_no]))
-			values = [int(x) if x is not '' else 0 for x in lines[line_no].split(',')]
-			if line_no < len(self.skill_entries):
-				# The first lines are all skills
-				idx = line_no
-				skill_entry = self.skill_entries[idx]
-				skill_entry.rank = values[0]
-				skill_entry.level = values[1]
-				skill_entry.xp = values[2]
-			elif line_no - len(self.skill_entries) < len(self.score_entries):
-				# Remaining lines are generic scores
-				idx = line_no - 24
-				score_entry = self.score_entries[idx]
-				score_entry.rank = values[0]
-				score_entry.score = values[1]
-		return self
+			self.scores[score_payload['name']] = score_entry
 
 	@staticmethod
 	@MWT(60*10)
@@ -206,7 +94,7 @@ class HiscoreResult(object):
 			timeout=5
 		)
 		if res.status_code == 200:
-			return HiscoreResult.parse(res.text)
+			return HiscoreResult(res.json())
 		else:
 			return None
 
